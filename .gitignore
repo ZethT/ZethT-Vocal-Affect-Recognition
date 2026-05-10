@@ -1,9 +1,15 @@
 # Project-specific
 .DS_Store
 *.docx
-*.html
-*.png
 setting.json
+
+# Secrets and environment
+.env
+secrets/
+
+# Experimental / large model artifacts only — do NOT ignore model/vocal_model_lr.joblib
+experiments/*.joblib
+model/experimental_*.joblib
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
