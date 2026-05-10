@@ -5,13 +5,15 @@ The pipeline (StandardScaler + LogisticRegression) is loaded once at module
 import time so the file is read from disk only on cold start, not per request.
 """
 
+import os
 import pathlib
 import joblib
 import pandas as pd
 
 from features import FEATURE_NAMES
 
-_MODEL_PATH = pathlib.Path(__file__).resolve().parent.parent / "model" / "vocal_model_lr.joblib"
+_DEFAULT_MODEL_PATH = pathlib.Path(__file__).resolve().parent.parent / "model" / "vocal_model_lr.joblib"
+_MODEL_PATH = pathlib.Path(os.environ.get("MODEL_PATH") or _DEFAULT_MODEL_PATH)
 
 pipeline = joblib.load(_MODEL_PATH)
 
