@@ -569,74 +569,6 @@ tbody tr:last-child td {
   outline-offset: 3px;
 }
 
-/* ── Footer ──────────────────────────────────────────────── */
-.footer {
-  background: var(--bg-dark);
-  border-top: 1px solid var(--border-dark);
-  padding-block: var(--space-xxl);
-}
-
-.footer-grid {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
-  gap: var(--space-xxl);
-}
-
-.footer-logo {
-  font-size: var(--text-sm);
-  font-weight: var(--weight-heading);
-  color: var(--text-primary);
-  margin-bottom: var(--space-md);
-}
-
-.footer-logo span {
-  color: var(--color-green);
-}
-
-.footer-desc {
-  font-size: var(--text-body-sm);
-  color: var(--text-muted);
-  line-height: 1.6;
-  max-width: 320px;
-}
-
-.footer-col h4 {
-  font-size: var(--text-body-xs);
-  font-weight: var(--weight-label);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  margin-bottom: var(--space-md);
-}
-
-.footer-col ul {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-sm);
-}
-
-.footer-col ul li a,
-.footer-col ul li {
-  font-size: var(--text-body-sm);
-  color: var(--text-secondary);
-  transition: color 150ms ease;
-}
-
-.footer-col ul li a:hover {
-  color: var(--text-primary);
-}
-
-.footer-bottom {
-  margin-top: var(--space-xxl);
-  padding-top: var(--space-lg);
-  border-top: 1px solid var(--border-dark);
-  font-size: var(--text-body-xs);
-  color: var(--text-muted);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
 
 /* ── Divider ─────────────────────────────────────────────── */
 .divider {
@@ -661,13 +593,6 @@ tbody tr:last-child td {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .footer-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .footer-grid > :first-child {
-    grid-column: 1 / -1;
-  }
 }
 
 @media (max-width: 768px) {
@@ -687,17 +612,6 @@ tbody tr:last-child td {
   .nav-cta .btn {
     padding: 10px 18px;
     font-size: var(--text-body-sm);
-  }
-
-  .footer-grid {
-    grid-template-columns: 1fr;
-    gap: var(--space-xl);
-  }
-
-  .footer-bottom {
-    flex-direction: column;
-    gap: var(--space-sm);
-    text-align: center;
   }
 
   h1, .h1 { font-size: var(--text-lg); }
