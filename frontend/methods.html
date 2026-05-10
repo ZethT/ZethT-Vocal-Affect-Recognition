@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Methods — Vocal Affect Recognition</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* ── Page header ─────────────────────────────────────── */
+    .page-header {
+      background:
+        radial-gradient(ellipse 60% 80% at 50% 30%, rgba(122, 0, 255, 0.2) 0%, transparent 65%),
+        var(--bg-dark);
+      padding: var(--space-xxl) 0 var(--space-xl);
+      text-align: center;
+    }
+
+    .page-header h1 {
+      font-size: clamp(32px, 5vw, 56px);
+      letter-spacing: -0.04em;
+      margin-bottom: var(--space-md);
+    }
+
+    .page-header .page-sub {
+      font-size: var(--text-body-lg);
+      color: var(--text-secondary);
+      max-width: 560px;
+      margin-inline: auto;
+    }
+
+    /* ── Shared section label ────────────────────────────── */
+    .section-label {
+      display: block;
+      font-size: var(--text-body-xs);
+      font-weight: var(--weight-label);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--color-purple);
+      margin-bottom: var(--space-md);
+    }
+
+    .section-dark-alt .section-label { color: var(--color-green); }
+
+    /* ── Prose ───────────────────────────────────────────── */
+    .prose-section { padding-block: var(--space-xxl); }
+
+    .prose-body {
+      font-size: var(--text-body-lg);
+      color: var(--text-dark-secondary);
+      line-height: 1.7;
+      max-width: 720px;
+    }
+
+    .prose-body p + p { margin-top: var(--space-md); }
+
+    /* ── Pipeline steps ──────────────────────────────────── */
+    .pipeline {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      margin-block: var(--space-xxl);
+      overflow-x: auto;
+    }
+
+    .pipeline-step {
+      flex: 1;
+      min-width: 140px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: var(--space-lg) var(--space-md);
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      position: relative;
+    }
+
+    .pipeline-step:first-child { border-radius: var(--radius-md) 0 0 var(--radius-md); }
+    .pipeline-step:last-child  { border-radius: 0 var(--radius-md) var(--radius-md) 0; }
+
+    .pipeline-step:not(:last-child)::after {
+      content: '→';
+      position: absolute;
+      right: -14px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 18px;
+      color: var(--color-purple);
+      font-weight: var(--weight-heading);
+      z-index: 1;
+      background: #fff;
+      padding-inline: 2px;
+    }
+
+    .pipeline-step .step-num {
+      font-size: var(--text-body-xs);
+      font-weight: var(--weight-heading);
+      color: var(--color-purple);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: var(--space-sm);
+    }
+
+    .pipeline-step .step-title {
+      font-size: var(--text-body-sm);
+      font-weight: var(--weight-label);
+      color: var(--text-dark-primary);
+      margin-bottom: 4px;
+    }
+
+    .pipeline-step .step-sub {
+      font-size: var(--text-body-xs);
+      color: var(--text-dark-muted);
+      line-height: 1.4;
+    }
+
+    /* ── Extraction specs list ───────────────────────────── */
+    .spec-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+      max-width: 720px;
+    }
+
+    .spec-row {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      gap: var(--space-lg);
+      padding: var(--space-md) var(--space-lg);
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      align-items: start;
+    }
+
+    .spec-row .spec-name {
+      font-size: var(--text-body-sm);
+      font-weight: var(--weight-label);
+      color: var(--text-dark-primary);
+    }
+
+    .spec-row .spec-name code {
+      display: block;
+      font-size: var(--text-body-xs);
+      font-weight: 400;
+      color: var(--color-purple);
+      margin-top: 2px;
+      font-family: 'Courier New', monospace;
+    }
+
+    .spec-row .spec-desc {
+      font-size: var(--text-body-sm);
+      color: var(--text-dark-secondary);
+      line-height: 1.6;
+    }
+
+    /* ── Model cards ─────────────────────────────────────── */
+    .model-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-lg);
+      margin-top: var(--space-xl);
+    }
+
+    .model-card {
+      padding: var(--space-xl);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+
+    .model-card .model-tag {
+      align-self: flex-start;
+    }
+
+    .model-card h3 {
+      color: var(--text-dark-primary);
+      font-size: var(--text-sm);
+    }
+
+    .model-card.deployed {
+      border: 1px solid rgba(120, 255, 30, 0.40);
+    }
+
+    .model-card.deployed h3 {
+      color: var(--text-dark-primary);
+    }
+
+    .model-card p {
+      font-size: var(--text-body-sm);
+      color: var(--text-dark-secondary);
+      line-height: 1.7;
+      flex: 1;
+    }
+
+    .model-params {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: var(--space-sm);
+      padding-top: var(--space-md);
+      border-top: 1px solid var(--border-light);
+    }
+
+    .model-param {
+      display: flex;
+      justify-content: space-between;
+      font-size: var(--text-body-xs);
+    }
+
+    .model-param .param-key {
+      color: var(--text-dark-muted);
+      font-weight: var(--weight-label);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .model-param .param-val {
+      color: var(--text-dark-primary);
+      font-family: 'Courier New', monospace;
+    }
+
+    /* ── Evaluation metrics ──────────────────────────────── */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-lg);
+      max-width: 720px;
+    }
+
+    .metric-def {
+      padding: var(--space-lg);
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+    }
+
+    .metric-def h4 {
+      color: var(--text-dark-primary);
+      margin-bottom: var(--space-sm);
+    }
+
+    .metric-def p {
+      font-size: var(--text-body-sm);
+      color: var(--text-dark-secondary);
+      line-height: 1.6;
+    }
+
+    /* ── System architecture ─────────────────────────────── */
+    .arch-section { padding-block: var(--space-xxl); }
+
+    .arch-flow {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+      max-width: 560px;
+    }
+
+    .arch-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-lg);
+      padding: var(--space-md) var(--space-lg);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-dark);
+      border-radius: var(--radius-md);
+    }
+
+    .arch-row .arch-icon {
+      font-size: 22px;
+      flex-shrink: 0;
+      width: 36px;
+      text-align: center;
+    }
+
+    .arch-row .arch-label {
+      font-size: var(--text-body-sm);
+      font-weight: var(--weight-label);
+      color: var(--text-primary);
+    }
+
+    .arch-row .arch-sub {
+      font-size: var(--text-body-xs);
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .arch-arrow {
+      padding-left: calc(36px + var(--space-lg) + var(--space-lg));
+      font-size: var(--text-body-xs);
+      color: var(--text-muted);
+    }
+
+    /* ── Responsive ─────────────────────────────────────── */
+    @media (max-width: 1024px) {
+      .model-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 768px) {
+      .pipeline { flex-direction: column; }
+
+      .pipeline-step {
+        border-radius: 0 !important;
+        border-bottom: none;
+      }
+
+      .pipeline-step:first-child { border-radius: var(--radius-md) var(--radius-md) 0 0 !important; }
+      .pipeline-step:last-child  { border-radius: 0 0 var(--radius-md) var(--radius-md) !important; border-bottom: 1px solid var(--border-light); }
+
+      .pipeline-step:not(:last-child)::after {
+        content: '↓';
+        right: auto;
+        left: 50%;
+        top: auto;
+        bottom: -14px;
+        transform: translateX(-50%);
+      }
+
+      .spec-row { grid-template-columns: 1fr; gap: var(--space-sm); }
+
+      .model-grid,
+      .metrics-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── NAV ─────────────────────────────────────────────── -->
+  <div class="nav-wrapper">
+    <nav class="nav">
+      <a href="index.html" class="nav-logo">Vocal<span>Affect</span></a>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="eda.html">EDA</a></li>
+        <li><a href="methods.html">Methods</a></li>
+        <li><a href="findings.html">Findings</a></li>
+        <li><a href="demo.html">Live Demo</a></li>
+      </ul>
+      <div class="nav-cta">
+        <a href="demo.html" class="btn btn-primary">Inference Demo</a>
+      </div>
+    </nav>
+  </div>
+
+  <!-- ── PAGE HEADER ──────────────────────────────────────── -->
+  <section class="page-header">
+    <div class="container">
+      <div style="margin-bottom: var(--space-md);">
+        <span class="badge badge-purple">Analytical Methods</span>
+      </div>
+      <h1>Pipeline &amp; Modeling</h1>
+      <p class="page-sub">
+        Audio preprocessing, acoustic feature extraction, classifier training,
+        and evaluation methodology.
+      </p>
+    </div>
+  </section>
+
+  <!-- ── 1. PIPELINE OVERVIEW ─────────────────────────────── -->
+  <section class="prose-section section-light">
+    <div class="container">
+      <span class="section-label">Overview</span>
+      <h2 style="color: var(--text-dark-primary); margin-bottom: var(--space-md);">End-to-End Pipeline</h2>
+      <p class="prose-body" style="margin-bottom: 0;">
+        Each audio clip passes through a five-stage pipeline from raw <code>.wav</code> file
+        to a predicted arousal label. All feature extraction logic in the deployed API
+        mirrors the notebook implementation exactly.
+      </p>
+
+      <div class="pipeline">
+        <div class="pipeline-step">
+          <span class="step-num">01</span>
+          <span class="step-title">Load Audio</span>
+          <span class="step-sub">librosa.load<br>mono, native sr</span>
+        </div>
+        <div class="pipeline-step">
+          <span class="step-num">02</span>
+          <span class="step-title">Extract Features</span>
+          <span class="step-sub">f0, centroid,<br>rolloff, HNR, MFCCs</span>
+        </div>
+        <div class="pipeline-step">
+          <span class="step-num">03</span>
+          <span class="step-title">Validate &amp; Clean</span>
+          <span class="step-sub">f0 range check,<br>drop NaN / Inf</span>
+        </div>
+        <div class="pipeline-step">
+          <span class="step-num">04</span>
+          <span class="step-title">Scale Features</span>
+          <span class="step-sub">StandardScaler<br>(inside pipeline)</span>
+        </div>
+        <div class="pipeline-step">
+          <span class="step-num">05</span>
+          <span class="step-title">Classify</span>
+          <span class="step-sub">Logistic Regression<br>→ label + prob</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 2. FEATURE EXTRACTION ────────────────────────────── -->
+  <section class="prose-section section-light-alt">
+    <div class="container">
+      <span class="section-label">Feature Extraction</span>
+      <h2 style="color: var(--text-dark-primary); margin-bottom: var(--space-md);">Extraction Methods</h2>
+      <p class="prose-body" style="margin-bottom: var(--space-xl);">
+        Features are computed per audio clip and mean-aggregated across time frames
+        to produce a single 17-dimensional feature vector. The same extraction code
+        runs in both the training notebook and the deployed FastAPI service.
+      </p>
+
+      <div class="spec-list">
+        <div class="spec-row">
+          <div class="spec-name">
+            Fundamental Frequency
+            <code>librosa.yin(fmin=50, fmax=500)</code>
+          </div>
+          <div class="spec-desc">
+            Pitch estimated via the YIN autocorrelation algorithm. Valid range restricted to
+            50–500 Hz to exclude sub-vocal and falsetto artifacts. Mean f0 across voiced frames is used.
+          </div>
+        </div>
+        <div class="spec-row">
+          <div class="spec-name">
+            Spectral Centroid
+            <code>librosa.feature.spectral_centroid()</code>
+          </div>
+          <div class="spec-desc">
+            Weighted mean frequency of the power spectrum, computed per frame and averaged.
+            Measures the "center of mass" of spectral energy — a proxy for timbral brightness.
+          </div>
+        </div>
+        <div class="spec-row">
+          <div class="spec-name">
+            Spectral Rolloff
+            <code>librosa.feature.spectral_rolloff()</code>
+          </div>
+          <div class="spec-desc">
+            Frequency below which 85% of spectral energy lies, averaged across frames.
+            Highly correlated with spectral centroid (r = 0.89) — both track brightness.
+          </div>
+        </div>
+        <div class="spec-row">
+          <div class="spec-name">
+            HNR (Harmonic-to-Noise Ratio)
+            <code>parselmouth → to_harmonicity_cc()</code>
+          </div>
+          <div class="spec-desc">
+            Computed via Praat's cross-correlation harmonicity algorithm (time_step = 0.01 s,
+            min_pitch = 50 Hz). Values below &minus;20 dB are treated as extraction artifacts
+            and excluded. Mean HNR across valid frames is used.
+          </div>
+        </div>
+        <div class="spec-row">
+          <div class="spec-name">
+            MFCCs (13 coefficients)
+            <code>librosa.feature.mfcc(n_mfcc=13)</code>
+          </div>
+          <div class="spec-desc">
+            Mel-Frequency Cepstral Coefficients computed on a Mel-scaled filterbank.
+            Each coefficient is averaged across frames. Captures the spectral envelope shape
+            at multiple scales of resolution — the feature set that drove accuracy from 70% to 92.9%.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 3. MODEL COMPARISON ──────────────────────────────── -->
+  <section class="prose-section section-light">
+    <div class="container">
+      <span class="section-label">Model Comparison</span>
+      <h2 style="color: var(--text-dark-primary); margin-bottom: var(--space-sm);">Classifiers Evaluated</h2>
+      <p style="color: var(--text-dark-secondary); font-size: var(--text-body-lg); max-width: 680px; margin-bottom: 0;">
+        Each model was trained on an 80/20 stratified train-test split (random_state = 42)
+        and evaluated on the held-out test set. All three were tested on both the
+        base four-feature set and the MFCC-augmented 17-feature set.
+      </p>
+
+      <div class="model-grid">
+
+        <div class="card card-light model-card deployed">
+          <span class="badge badge-green model-tag">Deployed &#10003;</span>
+          <h3>Logistic Regression</h3>
+          <p>
+            Linear classifier predicting class membership as a weighted sum of input features.
+            A <code>StandardScaler</code> is embedded in a scikit-learn <code>Pipeline</code>
+            to prevent data leakage. Used as the interpretable baseline and final deployed model —
+            coefficients directly show each feature's direction and magnitude of influence.
+            Adding MFCCs pushed its accuracy from 58.6% to <strong>92.9%</strong>, the highest
+            of any model tested.
+          </p>
+          <div class="model-params">
+            <div class="model-param">
+              <span class="param-key">Max Iterations</span>
+              <span class="param-val">1000</span>
+            </div>
+            <div class="model-param">
+              <span class="param-key">Scaler</span>
+              <span class="param-val">StandardScaler</span>
+            </div>
+            <div class="model-param">
+              <span class="param-key">Accuracy (+ MFCC)</span>
+              <span class="param-val" style="color: var(--color-green-dark); font-weight: 700;">92.9%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card card-light model-card">
+          <span class="badge badge-lavender model-tag">Comparison</span>
+          <h3>Random Forest</h3>
+          <p>
+            Ensemble of 100 decision trees, each trained on a random feature and sample
+            subset. Robust to non-linear boundaries and outliers in the HNR distribution
+            (which ranges from &minus;86 to +24 dB). Evaluated with 5-fold stratified
+            cross-validation to estimate generalization. Gini-based feature importance
+            scores identify which features drive classification — key for understanding
+            why MFCCs matter.
+          </p>
+          <div class="model-params">
+            <div class="model-param">
+              <span class="param-key">n_estimators</span>
+              <span class="param-val">100</span>
+            </div>
+            <div class="model-param">
+              <span class="param-key">Cross-validation</span>
+              <span class="param-val">5-fold stratified</span>
+            </div>
+            <div class="model-param">
+              <span class="param-key">Accuracy (+ MFCC)</span>
+              <span class="param-val">90.0%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card card-light model-card">
+          <span class="badge badge-lavender model-tag">Comparison</span>
+          <h3>XGBoost</h3>
+          <p>
+            Gradient-boosted trees that sequentially correct prior errors. Each new tree
+            focuses on residuals from the previous ensemble. Fitted via
+            <code>XGBClassifier</code> with a <code>LabelEncoder</code> for scikit-learn
+            compatibility. Consistent top-performer on structured tabular data, included
+            to test whether sequential error correction outperforms parallel ensembles
+            on this small, clean feature set.
+          </p>
+          <div class="model-params">
+            <div class="model-param">
+              <span class="param-key">n_estimators</span>
+              <span class="param-val">100</span>
+            </div>
+            <div class="model-param">
+              <span class="param-key">max_depth / lr</span>
+              <span class="param-val">3 / 0.1</span>
+            </div>
+            <div class="model-param">
+              <span class="param-key">eval_metric</span>
+              <span class="param-val">logloss</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 4. EVALUATION METRICS ────────────────────────────── -->
+  <section class="prose-section section-light-alt">
+    <div class="container">
+      <span class="section-label">Evaluation</span>
+      <h2 style="color: var(--text-dark-primary); margin-bottom: var(--space-xl);">Metrics Used</h2>
+      <div class="metrics-grid">
+        <div class="metric-def">
+          <h4>Accuracy</h4>
+          <p>
+            Proportion of correctly classified samples on the held-out test set.
+            Primary metric reported for all model variants. Classes are balanced,
+            so accuracy is not misleading here.
+          </p>
+        </div>
+        <div class="metric-def">
+          <h4>Precision &amp; Recall</h4>
+          <p>
+            Per-class precision (of all predicted positives, how many are correct) and
+            recall (of all actual positives, how many were found). Reported via
+            <code>classification_report</code>.
+          </p>
+        </div>
+        <div class="metric-def">
+          <h4>5-Fold Cross-Validation</h4>
+          <p>
+            Applied to Random Forest on the full dataset to estimate generalization
+            variance. Reports mean accuracy and per-fold scores. Used to confirm
+            the test-set result is stable.
+          </p>
+        </div>
+        <div class="metric-def">
+          <h4>ROC-AUC</h4>
+          <p>
+            Area under the receiver operating characteristic curve. Measures discrimination
+            ability across all classification thresholds, independent of the default 0.5
+            decision boundary. Plotted for both LR and RF.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 5. SYSTEM ARCHITECTURE ───────────────────────────── -->
+  <section class="arch-section section-dark-alt">
+    <div class="container">
+      <span class="section-label">System Architecture</span>
+      <h2 style="margin-bottom: var(--space-md);">Deployment Design</h2>
+      <p style="color: var(--text-secondary); font-size: var(--text-body-lg); max-width: 620px; margin-bottom: var(--space-xxl);">
+        The trained model is served as a containerized FastAPI application.
+        Prediction metadata is persisted to Firestore. The static frontend is
+        hosted separately on App Engine and communicates with the inference
+        service via <code>fetch()</code>.
+      </p>
+
+      <div class="arch-flow">
+        <div class="arch-row">
+          <span class="arch-icon">🌐</span>
+          <div>
+            <div class="arch-label">Frontend — Google App Engine</div>
+            <div class="arch-sub">Static HTML/CSS/JS · uploads .wav via fetch()</div>
+          </div>
+        </div>
+        <div class="arch-arrow">↓ POST /predict (multipart/form-data)</div>
+        <div class="arch-row">
+          <span class="arch-icon">⚙️</span>
+          <div>
+            <div class="arch-label">FastAPI Inference Service — Google Cloud Run</div>
+            <div class="arch-sub">Docker container · librosa + parselmouth + scikit-learn</div>
+          </div>
+        </div>
+        <div class="arch-arrow">↓ feature extraction → model.predict_proba()</div>
+        <div class="arch-row">
+          <span class="arch-icon">🤖</span>
+          <div>
+            <div class="arch-label">Logistic Regression Model</div>
+            <div class="arch-sub">vocal_model_lr.joblib · StandardScaler + LogisticRegression</div>
+          </div>
+        </div>
+        <div class="arch-arrow">↓ prediction JSON returned to frontend</div>
+        <div class="arch-row">
+          <span class="arch-icon">🗄️</span>
+          <div>
+            <div class="arch-label">Firestore — Google Cloud</div>
+            <div class="arch-sub">Prediction metadata stored · label, confidence, features, timestamp</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script src="nav.js"></script>
+</body>
+</html>
