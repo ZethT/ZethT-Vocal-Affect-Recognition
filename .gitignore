@@ -7,6 +7,8 @@ setting.json
 .env
 secrets/
 
+architecture.md
+tasks.md
 # Experimental / large model artifacts only — do NOT ignore model/vocal_model_lr.joblib
 experiments/*.joblib
 model/experimental_*.joblib
