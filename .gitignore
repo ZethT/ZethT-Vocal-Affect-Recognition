@@ -13,6 +13,10 @@ tasks.md
 experiments/*.joblib
 model/experimental_*.joblib
 
+architecture.md
+tasks.md
+
+design.json
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]

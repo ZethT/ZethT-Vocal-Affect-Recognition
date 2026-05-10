@@ -1,0 +1,14 @@
+# Web framework
+fastapi==0.128.8
+uvicorn[standard]==0.39.0
+python-multipart==0.0.20
+
+# ML / audio
+librosa==0.11.0
+numpy==2.0.2
+scikit-learn==1.6.1
+joblib==1.5.3
+praat-parselmouth==0.4.3
+
+# Cloud
+google-cloud-firestore==2.27.0
