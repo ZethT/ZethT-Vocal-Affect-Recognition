@@ -35,7 +35,31 @@ _Below is an example of how you can instruct your audience on installing and set
    ```sh
    git clone [https://github.com/yourusername/vocalset-classification.git](https://github.com/yourusername/vocalset-classification.git)
    ```
-2. Setup the conda environment using MakeFile
-   ```make
-   make create-env
-   ```
+2. Ensure the VocalSet audio data is present in the `/content/FULL/` directory or update the paths in `CS_163_Project.ipynb`.
+3. Run the notebook to process the audio and generate `vocal_features.csv`.
+
+## Usage
+The pipeline follows a strict machine learning workflow:
+* **Extraction:** `librosa` computes the Fundamental Frequency (F0), Spectral Centroid, Rolloff, HNR, and 13 MFCCs for each audio clip.
+* **Preprocessing:** Data is standardized using a `StandardScaler` within a pipeline to handle the varying scales of frequency vs. coefficient data.
+* **Training:** Multiple models (LogReg, Random Forest, XGBoost) are compared using an 80/20 train-test split.
+* **Validation:** Performance is visualized via confusion matrices and ROC curves to ensure high recall for both energy classes.
+
+## Results
+Our analysis proved that MFCCs are critical for energy classification. Adding MFCCs to the baseline spectral features boosted the Logistic Regression model's accuracy from 58.57% to 92.86%.
+
+| Model | Features | Accuracy |
+| :--- | :--- | :--- |
+| Logistic Regression | Basic Spectral | 58.57% |
+| Random Forest | Basic Spectral | 70.00% |
+| Logistic Regression | Basic + MFCCs | 92.86% |
+| Random Forest | Basic + MFCCs | 90.00% |
+
+The final Logistic Regression (+ MFCC) model is the recommended choice for production due to its high accuracy and lower computational overhead.
+
+## Roadmap
+- [x] Initial DSP Feature Extraction (F0, Centroid, HNR)
+- [x] Comparative Analysis of ML Architectures
+- [x] Timbral Optimization with MFCCs
+- [ ] Implement cross-validation for more robust error estimation
+- [ ] Build a web-based UI for real-time `.wav` classification
