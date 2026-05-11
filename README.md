@@ -7,25 +7,8 @@
     An automated machine learning pipeline for classifying vocal audio excerpts into high and low energy categories using Digital Signal Processing (DSP) and ensemble modeling.
     <br />
     <br />
-    <a href="https://github.com/yourusername/vocalset-classification/issues">Report Bug</a>
-    ·
-    <a href="https://github.com/yourusername/vocalset-classification/issues">Request Feature</a>
   </p>
 </div>
-
-<details>
-  <summary>Table of Contents</summary>
-  <ol>
-    <li><a href="#about-the-project">About The Project</a></li>
-    <li><a href="#directory-information">Directory Information</a></li>
-    <li><a href="#built-with">Built With</a></li>
-    <li><a href="#getting-started">Getting Started</a></li>
-    <li><a href="#usage">Usage</a></li>
-    <li><a href="#results">Results</a></li>
-    <li><a href="#roadmap">Roadmap</a></li>
-    <li><a href="#contact">Contact</a></li>
-  </ol>
-</details>
 
 ## About The Project
 
