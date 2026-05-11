@@ -424,7 +424,7 @@
           <div class="result-panel">
             <div class="result-empty" id="resultEmpty">
               <span class="empty-icon">📊</span>
-              <p>Awaiting input — choose a file and click <em>Classify</em>.</p>
+              <p>Choose a file above and click <em>Classify</em> to see results.</p>
             </div>
             <div class="result-content" id="resultContent">
               <!-- Populated by demo.js in tasks 5.3–5.6 -->
@@ -442,7 +442,7 @@
       <span class="section-label">Behind the Scenes</span>
       <h2 style="color: var(--text-dark-primary); margin-bottom: var(--space-md);">How It Works</h2>
       <p style="color: var(--text-dark-secondary); font-size: var(--text-body-lg); max-width: 680px; margin-bottom: 0;">
-        Three steps run server-side on every prediction.
+        Each time you upload a file, three steps run automatically on the server.
       </p>
 
       <div class="how-grid">
@@ -450,25 +450,27 @@
           <span class="step-num">Step 01</span>
           <h4>Feature Extraction</h4>
           <p>
-            librosa and Praat compute f0, spectral centroid, spectral rolloff,
-            HNR, and 13 MFCC coefficients from the uploaded audio.
+            librosa and Praat extract 17 acoustic measurements from the audio: pitch (f0),
+            timbral brightness (spectral centroid and rolloff), vocal cleanliness (HNR),
+            and 13 MFCC coefficients capturing tone color and texture.
           </p>
         </div>
         <div class="how-step">
           <span class="step-num">Step 02</span>
           <h4>Validation</h4>
           <p>
-            Features are checked against valid ranges (f0 ∈ [50, 500] Hz, HNR &ge; &minus;20 dB).
-            Invalid inputs return a 422 error rather than crashing.
+            Each extracted value is checked against expected ranges: pitch must fall between
+            50 and 500 Hz, and HNR must be above &minus;20 dB. Inputs outside these bounds
+            are flagged as invalid rather than passed to the model.
           </p>
         </div>
         <div class="how-step">
           <span class="step-num">Step 03</span>
           <h4>Classification</h4>
           <p>
-            The 17-feature vector is passed to the deployed Logistic Regression
-            pipeline (StandardScaler + LR). Returns label, confidence, and class
-            probabilities.
+            The 17 features are normalized and fed into the deployed Logistic Regression
+            model, which returns a predicted class label, a confidence score, and the
+            probability for each vocal class.
           </p>
         </div>
       </div>

@@ -137,7 +137,7 @@
     }
 
     .dist-dot.belt    { background: var(--color-green); }
-    .dist-dot.breathy { background: var(--color-lavender); }
+    .dist-dot.breathy { background: var(--color-purple); }
 
     .dist-count {
       font-size: var(--text-body-sm);
@@ -157,7 +157,7 @@
     }
 
     .dist-fill.belt    { background: var(--color-green); width: 52%; }
-    .dist-fill.breathy { background: var(--color-lavender); width: 48%; }
+    .dist-fill.breathy { background: var(--color-purple); width: 48%; }
 
     /* ── Feature table wrapper ───────────────────────────── */
     .feature-table-section {
@@ -445,12 +445,15 @@
           VocalSet is a research dataset of professional singers performing musical scales,
           arpeggios, long tones, and song excerpts across 17 distinct vocal techniques.
           We subset the full dataset to the two techniques with the clearest acoustic contrast
-          and most direct mapping to arousal level on Russell's Circumplex.
+          and most direct mapping to energy level: belt (powerful, high-pressure singing) and
+          breathy (soft, airy singing).
         </p>
         <p>
-          Files with silent passages, HNR values below &minus;20 dB (Praat extraction artifacts),
-          f0 outside the 50–500 Hz vocal range, or zero-valued spectral features were removed
-          before analysis. The resulting dataset is approximately balanced between the two classes.
+          Before analysis, we removed clips with silent passages, HNR values below &minus;20 dB
+          (a threshold indicating noise from the feature extraction tool rather than real vocal sound),
+          pitch values outside the 50–500 Hz range typical of singing voices, and any clips with
+          missing spectral measurements. The resulting dataset is approximately balanced between the
+          two classes.
         </p>
       </div>
 
@@ -458,14 +461,14 @@
       <div class="class-dist">
         <div class="dist-row">
           <div class="dist-header">
-            <span class="dist-name"><span class="dist-dot belt"></span>Belt &mdash; High Energy</span>
+            <span class="dist-name"><span class="dist-dot belt"></span>Belt (High Energy)</span>
             <span class="dist-count">~375 clips</span>
           </div>
           <div class="dist-track"><div class="dist-fill belt"></div></div>
         </div>
         <div class="dist-row">
           <div class="dist-header">
-            <span class="dist-name"><span class="dist-dot breathy"></span>Breathy &mdash; Low Energy</span>
+            <span class="dist-name"><span class="dist-dot breathy"></span>Breathy (Low Energy)</span>
             <span class="dist-count">~375 clips</span>
           </div>
           <div class="dist-track"><div class="dist-fill breathy"></div></div>
@@ -552,10 +555,10 @@
       <span class="section-label">Feature Set</span>
       <h2 style="color: var(--text-dark-primary); margin-bottom: var(--space-sm);">Extracted Acoustic Features</h2>
       <p style="color: var(--text-dark-secondary); font-size: var(--text-body-lg); max-width: 680px; margin-bottom: var(--space-xl);">
-        17 features per audio clip: 4 interpretable acoustic features and 13 MFCC coefficients
-        capturing timbral texture beyond what single spectral statistics can express.
-        MFCC coefficients approximate how humans perceive timbral texture, allowing the model to
-        capture subtle vocal coloration beyond simple pitch and brightness statistics.
+        Each audio clip is represented as 17 numeric features: 4 interpretable acoustic measurements
+        and 13 MFCC coefficients. MFCCs capture the tone color and texture of the voice in a compact
+        form that reflects how humans perceive timbre, going well beyond what simple pitch or
+        brightness statistics alone can describe.
       </p>
       <div class="table-wrapper">
         <table>
@@ -573,40 +576,38 @@
               <td><strong>f0</strong></td>
               <td>Acoustic</td>
               <td>Hz</td>
-              <td>Fundamental frequency (pitch) via YIN algorithm. Mean pitch across the clip.</td>
-              <td>Belt higher — chest-dominant phonation raises fundamental frequency.</td>
+              <td>Fundamental frequency, i.e. the perceived pitch of the voice. Computed using the YIN algorithm and averaged across the clip.</td>
+              <td>Belt higher. Powerful chest-dominant singing tends to produce a higher, more projected pitch.</td>
             </tr>
             <tr>
               <td><strong>spectral_centroid</strong></td>
               <td>Acoustic</td>
               <td>Hz</td>
-              <td>Weighted mean frequency of the power spectrum. Measures timbral "brightness."</td>
-              <td>Belt higher — louder, brighter harmonic series shifts centroid upward.</td>
+              <td>The "center of gravity" of the sound's frequency content. A higher value means the voice sounds brighter or sharper.</td>
+              <td>Belt higher. The strong, full harmonics of belt singing shift more energy toward higher frequencies.</td>
             </tr>
             <tr>
               <td><strong>spectral_rolloff</strong></td>
               <td>Acoustic</td>
               <td>Hz</td>
-              <td>Frequency below which 85% of spectral energy lies. Measures high-frequency energy.</td>
-              <td>Belt higher — correlated with centroid (r = 0.89); both track spectral brightness.</td>
+              <td>The frequency below which 85% of the sound's energy falls. Higher values mean the voice has more high-frequency content.</td>
+              <td>Belt higher. Closely tracks spectral centroid (r = 0.89); both reflect overall timbral brightness.</td>
             </tr>
             <tr>
               <td><strong>HNR</strong></td>
               <td>Acoustic</td>
               <td>dB</td>
-              <td>Harmonic-to-Noise Ratio via Praat. Measures periodicity vs. breathiness of the voice.</td>
-              <td>Belt higher — clean glottal closure produces more periodic signal; breathy has more noise floor.</td>
+              <td>Harmonic-to-Noise Ratio. Measures how clean and tonal the voice sounds versus airy and noisy. Computed using Praat.</td>
+              <td>Belt higher. Belt singing involves complete vocal fold closure, producing a cleaner, more periodic sound. Breathy singing lets air escape, adding noise.</td>
             </tr>
             <tr>
               <td><strong>mfcc_0 – mfcc_12</strong></td>
               <td>MFCC</td>
-              <td>—</td>
+              <td>(unitless)</td>
               <td>
-                13 Mel-Frequency Cepstral Coefficients. Compact representation of the spectral
-                envelope shape — capturing overall energy (mfcc_0) through increasingly fine
-                timbral texture (mfcc_1–12).
+                13 Mel-Frequency Cepstral Coefficients. A compact description of the overall shape of the voice's frequency spectrum, inspired by how the human ear perceives sound. mfcc_0 reflects overall loudness; mfcc_1 through mfcc_12 capture progressively finer details of vocal texture and tone color.
               </td>
-              <td>Strong class separation — MFCCs drove accuracy from 70% to 92.8% when added.</td>
+              <td>Strong class separation. Adding MFCCs raised accuracy from around 70% to 92.8%, confirming they capture the timbral differences that simpler features miss.</td>
             </tr>
           </tbody>
         </table>
@@ -620,9 +621,9 @@
       <span class="section-label">Feature Distributions</span>
       <h2 style="color: var(--text-dark-primary); margin-bottom: var(--space-md);">Acoustic Feature Histograms by Class</h2>
       <p style="color: var(--text-dark-secondary); font-size: var(--text-body-lg); max-width: 680px; margin-bottom: var(--space-xl);">
-        Per-feature distributions for belt and breathy classes plotted side-by-side. Overlap regions
-        indicate where individual features are insufficient for discrimination; separation indicates
-        discriminative power.
+        Per-feature distributions for the belt and breathy classes plotted side by side. Where the
+        two distributions overlap, a single feature cannot reliably tell the classes apart. Where
+        they separate cleanly, the feature carries discriminative power.
       </p>
       <div class="figure-with-text" style="grid-template-columns: 3fr 2fr;">
         <div class="figure-card">
@@ -636,19 +637,20 @@
         <div class="figure-text">
           <h3>Interpretation</h3>
           <p>
-            f0 and HNR show the clearest class separation — belt vocals cluster at higher fundamental
-            frequencies and higher harmonic-to-noise ratios, consistent with the chest-dominant
-            phonation mechanism.
+            f0 (pitch) and HNR (vocal cleanliness) show the clearest separation between the two
+            classes. Belt vocals cluster at higher pitch values and higher HNR scores, which is
+            consistent with the powerful, closed-fold technique they involve.
           </p>
           <p>
-            Spectral centroid and rolloff distributions largely overlap between classes, confirming
-            they are weaker individual discriminators. Their utility to the model is further limited
-            by their near-redundancy (r = 0.89).
+            Spectral centroid and rolloff distributions overlap considerably between classes,
+            confirming they are weaker individual predictors. They also carry nearly identical
+            information (r = 0.89), so they largely duplicate each other's contribution to the model.
           </p>
           <p>
-            The MFCC coefficients — particularly mfcc_0 (log energy) and mfcc_1 — show strong
-            bimodal distributions, with the two classes peaking in distinct regions. This is the
-            primary driver of the accuracy jump from 70% to 92.8% when MFCCs are added.
+            The MFCC coefficients, particularly mfcc_0 (which reflects overall loudness) and mfcc_1,
+            show clear two-peaked distributions with the belt and breathy classes peaking in
+            distinct regions. This visual separation is the main reason accuracy jumps so sharply
+            when MFCCs are added to the feature set.
           </p>
           <div class="finding-note">
             Each histogram uses the same y-axis scale per feature to allow direct visual comparison
@@ -665,8 +667,9 @@
       <span class="section-label">Feature Correlation</span>
       <h2 style="color: var(--text-dark-primary); margin-bottom: var(--space-md);">Correlation Heatmap</h2>
       <p style="color: var(--text-dark-secondary); font-size: var(--text-body-lg); max-width: 680px; margin-bottom: var(--space-xl);">
-        Pearson correlation matrix across the four primary acoustic features. High off-diagonal
-        values indicate redundancy; near-zero values indicate orthogonal, independent signal.
+        Pearson correlation matrix across the four primary acoustic features. Values close to +1 or
+        -1 indicate that two features move together and carry overlapping information. Values near
+        zero indicate features that measure independent aspects of the voice.
       </p>
       <div class="figure-with-text reverse">
         <div class="figure-card">
@@ -680,26 +683,27 @@
         <div class="figure-text">
           <h3>Interpretation</h3>
           <p>
-            The strongest off-diagonal correlation is between <strong>spectral_centroid</strong> and
-            <strong>spectral_rolloff</strong> (r = 0.89). Both features measure spectral brightness
-            and carry nearly identical information — motivating the collinearity analysis in the PCA
-            section of the Findings page.
+            The strongest correlation is between <strong>spectral_centroid</strong> and
+            <strong>spectral_rolloff</strong> (r = 0.89). Both features capture the same underlying
+            property, how bright or sharp the voice sounds, and carry nearly identical information.
+            This redundancy is explored further through PCA on the Findings page.
           </p>
           <p>
-            Consecutive MFCC coefficients (e.g. mfcc_1 and mfcc_2) show moderate positive correlation,
-            which is expected given the overlapping Mel filterbank basis functions. Despite this,
-            each coefficient captures a distinct scale of timbral texture and the aggregate set
+            Consecutive MFCC coefficients (such as mfcc_1 and mfcc_2) show moderate positive
+            correlation. This is expected: the Mel filterbank underlying MFCCs uses overlapping
+            frequency bands, so adjacent coefficients naturally share some information. Even so,
+            each coefficient captures a distinct scale of timbral detail, and the full set together
             provides strong discriminative power.
           </p>
           <p>
-            f0 and HNR are weakly correlated with the MFCC block, confirming they contribute
-            independent acoustic information that complements the spectral envelope captured by MFCCs.
-            Correlation values are reported using Pearson's r coefficient.
+            f0 (pitch) and HNR (vocal cleanliness) are only weakly correlated with the MFCC block,
+            confirming that they contribute independent information. Correlation values are reported
+            using Pearson's r coefficient.
           </p>
           <div class="finding-note">
-            High intra-MFCC correlation is not a problem here — it reflects the physics of the Mel
-            filterbank, not measurement redundancy. Regularized models like Logistic Regression
-            handle this gracefully.
+            The moderate intra-MFCC correlation does not reduce model quality. It reflects how the
+            Mel filterbank is designed, not a data problem. Regularized models like Logistic
+            Regression handle this kind of correlation gracefully.
           </div>
         </div>
       </div>
@@ -714,29 +718,30 @@
       <div class="insights-grid">
         <div class="card card-finding insight-card">
           <div class="insight-num">Finding 01</div>
-          <h4>Centroid &amp; Rolloff Are Collinear</h4>
+          <h4>Centroid &amp; Rolloff Are Redundant</h4>
           <p>
-            Pearson correlation of r = 0.89 between spectral centroid and spectral rolloff.
-            Both features track the same underlying property — timbral brightness — and provide
-            near-redundant information to linear classifiers.
+            Spectral centroid and spectral rolloff are correlated at r = 0.89. Both features
+            measure the same underlying property (timbral brightness) and contribute nearly
+            identical information to linear classifiers.
           </p>
         </div>
         <div class="card card-finding insight-card">
           <div class="insight-num">Finding 02</div>
           <h4>HNR Artifacts Required Filtering</h4>
           <p>
-            Praat's harmonicity algorithm returned values below &minus;20 dB for some clips,
-            indicating extraction failure rather than genuine signal. These 
-            rows were removed before modeling to avoid biasing the HNR feature distribution.
+            Praat's HNR algorithm returned values below &minus;20 dB for some clips, which
+            indicates a failed extraction rather than a genuine vocal measurement. Those rows
+            were removed before modeling to keep the HNR feature distribution reliable.
           </p>
         </div>
         <div class="card card-finding insight-card">
           <div class="insight-num">Finding 03</div>
           <h4>MFCCs Unlock Class Separation</h4>
           <p>
-            The four base features alone topped out at 70% accuracy (Random Forest). Adding
-            13 MFCC coefficients pushed Logistic Regression to 91.4% (and XGBoost to 92.8%) — confirming that
-            timbral texture beyond single spectral statistics is the dominant predictor.
+            Using only the four base acoustic features, Random Forest accuracy topped out around
+            70%. Adding 13 MFCC tone-texture coefficients pushed Logistic Regression to 91.4%
+            and XGBoost to 92.8%, confirming that capturing vocal texture is the key to
+            distinguishing these two singing styles.
           </p>
         </div>
       </div>

@@ -177,7 +177,7 @@
     }
 
     .class-row .class-dot.belt    { background: var(--color-green); }
-    .class-row .class-dot.breathy { background: var(--color-lavender); }
+    .class-row .class-dot.breathy { background: var(--color-purple); }
 
     .class-row .class-name {
       font-weight: var(--weight-label);
@@ -361,17 +361,21 @@
       <div class="prose-body">
         <p>
           This project investigates whether acoustic features extracted from a singing voice
-          can reliably classify the singer's vocal technique — and, by extension, the emotional
-          energy of a music track. We use the <strong>VocalSet</strong> dataset, a collection of
-          professional singers performing identical musical material across multiple vocal techniques,
-          focusing on two: <em>belt</em> (high-energy) and <em>breathy</em> (low-energy).
+          can reliably classify the singer's vocal technique and, by extension, the emotional
+          energy level of a music track. We use the <strong>VocalSet</strong> dataset, a collection of
+          recordings from professional singers performing across multiple vocal techniques.
+          We focus on two: <em>belt</em> (high-energy, powerful) and <em>breathy</em> (low-energy, airy).
         </p>
         <p>
-          Using <strong>librosa</strong> and <strong>Praat</strong>, we extract four acoustic features
-          per audio clip — fundamental frequency (f0), spectral centroid, spectral rolloff, and
-          harmonic-to-noise ratio (HNR) — along with 13 MFCC coefficients. Three classifiers are
-          trained and evaluated: Logistic Regression, Random Forest, and XGBoost. The best-performing
-          model is deployed as a live inference API on Google Cloud Run.
+          Using the audio analysis libraries <strong>librosa</strong> and <strong>Praat</strong>,
+          we extract four acoustic measurements per clip: fundamental frequency (the perceived pitch
+          of the voice), spectral centroid (how bright or sharp the voice sounds), spectral rolloff
+          (the frequency below which most of the sound energy falls), and harmonic-to-noise ratio
+          (how clean and tonal the voice is versus airy and noisy). We also extract 13 MFCC
+          coefficients, which together capture the tone color and texture of the voice in a way that
+          mirrors how humans perceive timbre. Three classifiers are trained and evaluated: Logistic
+          Regression, Random Forest, and XGBoost. The best-performing model is deployed as a live
+          inference API on Google Cloud Run.
         </p>
       </div>
     </div>
@@ -386,13 +390,13 @@
         <p>
           Determine whether a machine learning classifier trained on acoustic features
           of <em>vocal technique</em> can accurately predict the <em>arousal level</em>
-          (high-energy vs. low-energy) of a singing recording — without access to
+          (high-energy vs. low-energy) of a singing recording, without access to
           lyrical content, genre metadata, or listener ratings.
         </p>
         <p>
           A successful classifier would allow music recommendation systems to
-          infer emotional intensity directly from the audio signal, enabling
-          mood-based filtering that generalizes across genres and languages.
+          infer emotional intensity directly from the audio signal itself, enabling
+          mood-based filtering that works across genres and languages.
         </p>
       </div>
     </div>
@@ -407,28 +411,28 @@
         <li>
           <span class="h-num">H1</span>
           <div>
-            <span class="h-text">Belt vocals will have a higher median fundamental frequency (f0) than breathy vocals.</span>
+            <span class="h-text">Belt vocals will have a higher median fundamental frequency (f0, i.e. perceived pitch) than breathy vocals.</span>
             <span class="h-feature">Feature: f0 &middot; Prediction: belt median f0 &gt; breathy median f0</span>
           </div>
         </li>
         <li>
           <span class="h-num">H2</span>
           <div>
-            <span class="h-text">Belt vocals will have a brighter timbral spectrum, reflected in higher spectral centroid and rolloff values.</span>
+            <span class="h-text">Belt vocals will sound brighter, reflected in higher spectral centroid and rolloff values. Spectral centroid measures how high-frequency-weighted the sound energy is; rolloff marks the frequency below which 85% of energy falls.</span>
             <span class="h-feature">Features: spectral_centroid, spectral_rolloff</span>
           </div>
         </li>
         <li>
           <span class="h-num">H3</span>
           <div>
-            <span class="h-text">Belt vocals will exhibit greater harmonic periodicity, resulting in a higher harmonic-to-noise ratio (HNR).</span>
+            <span class="h-text">Belt vocals will sound cleaner and more tonal, resulting in a higher harmonic-to-noise ratio (HNR). HNR measures how much of the voice is clean harmonic tone versus airy noise.</span>
             <span class="h-feature">Feature: HNR &middot; Belt HNR &gt; Breathy HNR</span>
           </div>
         </li>
         <li>
           <span class="h-num">H4</span>
           <div>
-            <span class="h-text">Adding MFCC features will significantly improve classification accuracy beyond the four base acoustic features alone.</span>
+            <span class="h-text">Adding MFCC features (which capture tone color and texture beyond simple pitch and brightness) will significantly improve classification accuracy beyond the four base acoustic features alone.</span>
             <span class="h-feature">Features: mfcc_0 – mfcc_12</span>
           </div>
         </li>
@@ -455,16 +459,16 @@
         <div class="class-row">
           <span class="class-name"><span class="class-dot belt"></span>Belt</span>
           <span class="class-desc">
-            Chest-dominant, high-pressure phonation. High f0, bright spectrum, strong harmonic content.
+            Powerful, chest-driven singing with full vocal pressure. Sounds bright and high-energy, with a strong pitch and clean tonal quality.
           </span>
           <span class="badge badge-green class-tag">High Energy</span>
         </div>
         <div class="class-row">
           <span class="class-name"><span class="class-dot breathy"></span>Breathy</span>
           <span class="class-desc">
-            Incomplete glottal closure. Lower pitch, darker spectrum, elevated noise-to-harmonic ratio.
+            Soft, airy singing where air escapes past the vocal cords. Sounds quieter and darker, with a lower pitch and a noisy, whispery quality.
           </span>
-          <span class="badge badge-lavender class-tag">Low Energy</span>
+          <span class="badge badge-purple class-tag">Low Energy</span>
         </div>
       </div>
     </div>
@@ -477,7 +481,8 @@
       <h2>Classification Accuracy</h2>
       <p class="results-sub">
         XGBoost reached the highest accuracy at 92.8%, with Logistic Regression close behind at 91.4%.
-        Logistic Regression was selected for deployment for its simplicity and interpretability.
+        Logistic Regression was selected for deployment because it offers nearly the same accuracy
+        with simpler, more interpretable predictions.
       </p>
 
       <div class="accuracy-row">
@@ -499,24 +504,7 @@
         </div>
       </div>
 
-      <div class="results-figures">
-        <div class="figure-card">
-          <img src="assets/confusion_matrix.png" alt="Confusion matrix — Logistic Regression with MFCC features" />
-          <p class="figure-caption">
-            <strong>Figure 1 — Confusion Matrix</strong> (Logistic Regression + MFCC)<br>
-            Near-perfect separation on the held-out test set.
-          </p>
-        </div>
-        <div class="figure-card">
-          <img src="assets/feature_importance.png" alt="Feature importance bar chart from Random Forest" />
-          <p class="figure-caption">
-            <strong>Figure 2 — Feature Importance</strong> (Random Forest)<br>
-            MFCC coefficients account for the majority of predictive power.
-          </p>
-        </div>
-      </div>
-
-      <div style="margin-top: var(--space-xxl);">
+      <div style="margin-top: var(--space-xl);">
         <a href="findings.html" class="btn btn-ghost">View Full Findings &rarr;</a>
       </div>
     </div>
@@ -529,10 +517,11 @@
       <h2 style="color: var(--text-dark-primary); margin-bottom: var(--space-lg);">Live Inference Demo</h2>
       <div class="demo-inner">
         <p>
-          The deployed Logistic Regression model is accessible via a FastAPI inference
-          service hosted on Google Cloud Run. Upload a <code>.wav</code> audio file to
-          receive a real-time vocal affect prediction, including the predicted class,
-          confidence score, class probabilities, and extracted acoustic features.
+          The deployed Logistic Regression model is accessible via a live inference API
+          hosted on Google Cloud Run. Upload a <code>.wav</code> audio file to receive
+          a real-time vocal affect prediction, including the predicted energy class,
+          confidence score, class probabilities, and the extracted acoustic measurements
+          used to make the prediction.
         </p>
         <a href="demo.html" class="btn btn-secondary">Open Inference Demo</a>
       </div>

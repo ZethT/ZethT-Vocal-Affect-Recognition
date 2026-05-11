@@ -451,35 +451,36 @@
       <h2 style="color: var(--text-dark-primary); margin-bottom: var(--space-md);">End-to-End Pipeline</h2>
       <p class="prose-body" style="margin-bottom: 0;">
         Each audio clip passes through a five-stage pipeline from raw <code>.wav</code> file
-        to a predicted arousal label. All feature extraction logic in the deployed API
-        mirrors the notebook implementation exactly.
+        to a predicted energy label. The same feature extraction code runs in both the
+        training notebook and the deployed inference service, ensuring consistency between
+        training and production.
       </p>
 
       <div class="pipeline">
         <div class="pipeline-step">
           <span class="step-num">01</span>
           <span class="step-title">Load Audio</span>
-          <span class="step-sub">librosa.load<br>mono, native sr</span>
+          <span class="step-sub">Read .wav file<br>as mono signal</span>
         </div>
         <div class="pipeline-step">
           <span class="step-num">02</span>
           <span class="step-title">Extract Features</span>
-          <span class="step-sub">f0, centroid,<br>rolloff, HNR, MFCCs</span>
+          <span class="step-sub">pitch, brightness,<br>HNR, tone texture</span>
         </div>
         <div class="pipeline-step">
           <span class="step-num">03</span>
           <span class="step-title">Validate &amp; Clean</span>
-          <span class="step-sub">f0 range check,<br>drop NaN / Inf</span>
+          <span class="step-sub">Check pitch range,<br>drop invalid values</span>
         </div>
         <div class="pipeline-step">
           <span class="step-num">04</span>
           <span class="step-title">Scale Features</span>
-          <span class="step-sub">StandardScaler<br>(inside pipeline)</span>
+          <span class="step-sub">Normalize to<br>comparable units</span>
         </div>
         <div class="pipeline-step">
           <span class="step-num">05</span>
           <span class="step-title">Classify</span>
-          <span class="step-sub">Logistic Regression<br>→ label + prob</span>
+          <span class="step-sub">Logistic Regression<br>→ label + confidence</span>
         </div>
       </div>
     </div>
@@ -491,64 +492,66 @@
       <span class="section-label">Feature Extraction</span>
       <h2 style="color: var(--text-dark-primary); margin-bottom: var(--space-md);">Extraction Methods</h2>
       <p class="prose-body" style="margin-bottom: var(--space-xl);">
-        Features are computed per audio clip and mean-aggregated across time frames
-        to produce a single 17-dimensional feature vector. The same extraction code
-        runs in both the training notebook and the deployed FastAPI service.
+        Each audio clip is summarized as a single vector of 17 numeric features. Each
+        measurement is averaged across the clip's time frames so one number represents
+        the whole recording. The same extraction code runs in both the training notebook
+        and the deployed inference service.
       </p>
 
       <div class="spec-list">
         <div class="spec-row">
           <div class="spec-name">
             Fundamental Frequency
-            <code>librosa.yin(fmin=50, fmax=500)</code>
           </div>
           <div class="spec-desc">
-            Pitch estimated via the YIN autocorrelation algorithm. Valid range restricted to
-            50–500 Hz to exclude sub-vocal and falsetto artifacts. Mean f0 across voiced frames is used.
+            The perceived pitch of the voice, estimated using the YIN algorithm. Only
+            values in the 50–500 Hz singing range are kept; anything outside that range
+            is treated as an extraction error. The mean pitch across all voiced frames is used.
           </div>
         </div>
         <div class="spec-row">
           <div class="spec-name">
             Spectral Centroid
-            <code>librosa.feature.spectral_centroid()</code>
           </div>
           <div class="spec-desc">
-            Weighted mean frequency of the power spectrum, computed per frame and averaged.
-            Measures the "center of mass" of spectral energy — a proxy for timbral brightness.
+            The "center of gravity" of the sound's frequency content. A higher spectral
+            centroid means the voice sounds brighter or sharper. Computed per frame and
+            averaged across the clip.
           </div>
         </div>
         <div class="spec-row">
           <div class="spec-name">
             Spectral Rolloff
-            <code>librosa.feature.spectral_rolloff()</code>
           </div>
           <div class="spec-desc">
-            Frequency below which 85% of spectral energy lies, averaged across frames.
-            Highly correlated with spectral centroid (r = 0.89) — both track brightness.
+            The frequency below which 85% of the sound's energy falls. Higher values mean
+            the voice has more high-frequency content. Closely tracks spectral centroid
+            (r = 0.89), so both features reflect the same timbral brightness property.
           </div>
         </div>
         <div class="spec-row">
           <div class="spec-name">
             HNR (Harmonic-to-Noise Ratio)
-            <code>parselmouth → to_harmonicity_cc()</code>
           </div>
           <div class="spec-desc">
-            Computed via Praat's cross-correlation harmonicity algorithm (time_step = 0.01 s,
-            min_pitch = 50 Hz). Values below &minus;20 dB are treated as extraction artifacts
-            and excluded. Mean HNR across valid frames is used.
+            Measures how clean and tonal the voice sounds versus airy and noisy. Computed
+            using Praat's cross-correlation algorithm (time step = 0.01 s, minimum pitch =
+            50 Hz). Values below &minus;20 dB indicate a failed extraction rather than a
+            genuine vocal measurement and are excluded before modeling.
           </div>
         </div>
         <div class="spec-row">
           <div class="spec-name">
             MFCCs (13 coefficients)
-            <code>librosa.feature.mfcc(n_mfcc=13)</code>
           </div>
           <div class="spec-desc">
-            Mel-Frequency Cepstral Coefficients computed on a Mel-scaled filterbank.
-            Each coefficient is averaged across frames. MFCCs were included because raw spectral
-            statistics alone cannot capture detailed vocal timbre structure and harmonic envelope
-            shape — they capture the spectral envelope at multiple scales of resolution and are the
-            feature set that drove accuracy from 70% to 92.8%.
+            Mel-Frequency Cepstral Coefficients capture the tone color and texture of the
+            voice in a compact form inspired by how the human auditory system processes
+            sound. Each of the 13 coefficients describes a different scale of timbral
+            detail, from overall loudness (mfcc_0) to fine harmonic texture (mfcc_1–12).
+            Each coefficient is averaged across frames. Adding MFCCs to the feature set
+            drove accuracy from around 70% to 92.8%, confirming they capture the vocal
+            differences that simpler measurements miss.
           </div>
         </div>
       </div>
@@ -556,11 +559,13 @@
       <div class="scaling-note">
         <span class="note-label">Feature Scaling</span>
         <p>
-          Features were z-score normalized before training using <code>StandardScaler</code>
-          to prevent unit dominance (Hz vs. dB scales) and improve gradient convergence for
-          linear models. The scaler is embedded inside a scikit-learn <code>Pipeline</code>
-          so normalization parameters are fit only on training data and applied consistently
-          at inference time.
+          Before training, all features are normalized using z-score standardization
+          (<code>StandardScaler</code>). This is necessary because features have very
+          different units and ranges: pitch is in Hz (50–500), HNR is in dB, and MFCC
+          values are unitless. Without normalization, large-scale features would dominate
+          the linear model. The scaler is embedded inside a scikit-learn <code>Pipeline</code>
+          so normalization is learned only from training data and applied consistently at
+          inference time.
         </p>
       </div>
     </div>
@@ -572,8 +577,9 @@
       <span class="section-label">Model Comparison</span>
       <h2 style="color: var(--text-dark-primary); margin-bottom: var(--space-sm);">Classifiers Evaluated</h2>
       <p style="color: var(--text-dark-secondary); font-size: var(--text-body-lg); max-width: 680px; margin-bottom: 0;">
-        Each model was trained and evaluated on the same held-out split. All three were
-        tested on both the base four-feature set and the MFCC-augmented 17-feature set.
+        Three classifiers were trained and evaluated on the same held-out test split. Each
+        model was tested on both the base four-feature set and the full 17-feature set that
+        includes MFCCs.
       </p>
 
       <div class="split-strip">
@@ -601,15 +607,13 @@
           <span class="badge badge-green model-tag">Deployed &#10003;</span>
           <h3>Logistic Regression</h3>
           <p>
-            Linear classifier predicting class membership as a weighted sum of input features.
-            A <code>StandardScaler</code> is embedded in a scikit-learn <code>Pipeline</code>
-            to prevent data leakage. Used as the interpretable baseline and final deployed model —
-            coefficients directly show each feature's direction and magnitude of influence.
-            Adding MFCCs pushed its accuracy from 58.6% to <strong>91.4%</strong>. Although
-            XGBoost achieved slightly higher accuracy (92.8%), Logistic Regression was selected
-            for deployment because it offered comparable performance with lower inference complexity,
-            easier interpretability via model coefficients, and more stable probability calibration
-            on this small, clean feature set.
+            Logistic Regression predicts class membership as a weighted combination of the
+            input features, making it the most transparent of the three models. Each feature's
+            coefficient directly shows its direction and strength of influence on the prediction.
+            Adding MFCCs pushed accuracy from 58.6% to <strong>91.4%</strong>. Although XGBoost
+            reached 92.8%, Logistic Regression was selected for deployment because it offers
+            nearly the same accuracy with simpler predictions, clear interpretability, and more
+            reliable confidence scores on this small, well-structured feature set.
           </p>
           <div class="model-params">
             <div class="model-param">
@@ -631,12 +635,12 @@
           <span class="badge badge-purple model-tag">Comparison</span>
           <h3>Random Forest</h3>
           <p>
-            Ensemble of 100 decision trees, each trained on a random feature and sample
-            subset. Robust to non-linear boundaries and outliers in the HNR distribution
-            (which ranges from &minus;86 to +24 dB). Evaluated with 5-fold stratified
-            cross-validation to estimate generalization. Gini-based feature importance
-            scores identify which features drive classification — key for understanding
-            why MFCCs matter.
+            An ensemble of 100 decision trees, each trained on a random subset of the
+            features and samples. This diversity makes Random Forest robust to outliers
+            and non-linear patterns, such as the wide spread of HNR values in the data.
+            It was also evaluated with 5-fold cross-validation to confirm generalization.
+            Its Gini-based feature importance scores reveal which features contribute most
+            to classification, providing interpretable insight into why MFCCs matter.
           </p>
           <div class="model-params">
             <div class="model-param">
@@ -658,12 +662,12 @@
           <span class="badge badge-purple model-tag">Comparison</span>
           <h3>XGBoost</h3>
           <p>
-            Gradient-boosted trees that sequentially correct prior errors. Each new tree
-            focuses on residuals from the previous ensemble. Fitted via
-            <code>XGBClassifier</code> with a <code>LabelEncoder</code> for scikit-learn
-            compatibility. Consistent top-performer on structured tabular data, included
-            to test whether sequential error correction outperforms parallel ensembles
-            on this small, clean feature set.
+            A gradient-boosted tree model that builds predictions iteratively. Each new
+            tree focuses on correcting the mistakes made by the previous ones, gradually
+            improving accuracy. XGBoost consistently performs well on structured tabular
+            data and was included to test whether this sequential error-correction approach
+            could outperform the parallel ensemble of Random Forest on this feature set.
+            It achieved the highest overall accuracy at 92.8%.
           </p>
           <div class="model-params">
             <div class="model-param">
@@ -698,33 +702,36 @@
         <div class="metric-def">
           <h4>Accuracy</h4>
           <p>
-            Proportion of correctly classified samples on the held-out test set.
-            Primary metric reported for all model variants. Classes are balanced,
-            so accuracy is not misleading here.
+            The percentage of test samples classified correctly. This is the primary metric
+            reported across all model variants. Because the dataset is nearly balanced between
+            the two classes, accuracy gives a fair picture of model performance.
           </p>
         </div>
         <div class="metric-def">
           <h4>Precision &amp; Recall</h4>
           <p>
-            Per-class precision (of all predicted positives, how many are correct) and
-            recall (of all actual positives, how many were found). Reported via
+            Per-class diagnostics. Precision measures how often a positive prediction is
+            actually correct. Recall measures how many of the true positives the model
+            successfully identified. Both are reported for each class via
             <code>classification_report</code>.
           </p>
         </div>
         <div class="metric-def">
           <h4>5-Fold Cross-Validation</h4>
           <p>
-            Applied to Random Forest on the full dataset to estimate generalization
-            variance. Reports mean accuracy and per-fold scores. Used to confirm
-            the test-set result is stable.
+            Applied to Random Forest on the full dataset. The data is split into five
+            equal folds; the model trains on four and tests on the remaining one, rotating
+            through all folds. The mean accuracy across folds confirms whether the test-set
+            result is stable or a statistical fluke.
           </p>
         </div>
         <div class="metric-def">
           <h4>ROC-AUC</h4>
           <p>
-            Area under the receiver operating characteristic curve. Measures discrimination
-            ability across all classification thresholds, independent of the default 0.5
-            decision boundary. Plotted for both LR and RF.
+            The area under the ROC curve measures how well the model separates the two
+            classes across all possible decision thresholds, not just the default 50%
+            cutoff. A score of 1.0 is perfect separation; 0.5 is no better than random.
+            Plotted for both Logistic Regression and Random Forest.
           </p>
         </div>
       </div>
