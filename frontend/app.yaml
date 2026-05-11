@@ -1,0 +1,17 @@
+runtime: python313
+
+handlers:
+  - url: /assets
+    static_dir: assets
+
+  - url: /(.*\.(css|js))
+    static_files: \1
+    upload: .*\.(css|js)
+
+  - url: /(.*\.html)
+    static_files: \1
+    upload: .*\.html
+
+  - url: /
+    static_files: index.html
+    upload: index.html
