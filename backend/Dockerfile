@@ -14,7 +14,7 @@ COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
-COPY backend/features.py backend/model.py backend/main.py ./
+COPY backend/features.py backend/model.py backend/main.py backend/firestore_client.py ./
 
 # Copy model artifact — built from repo root so ../model/ is accessible
 COPY model/vocal_model_lr.joblib /app/model/vocal_model_lr.joblib

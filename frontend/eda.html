@@ -414,7 +414,7 @@
                 envelope shape — capturing overall energy (mfcc_0) through increasingly fine
                 timbral texture (mfcc_1–12).
               </td>
-              <td>Strong class separation — MFCCs drove accuracy from 70% to 92.9% when added.</td>
+              <td>Strong class separation — MFCCs drove accuracy from 70% to 92.8% when added.</td>
             </tr>
           </tbody>
         </table>
@@ -484,9 +484,9 @@
             (AUC = 1.0); random guessing follows the diagonal (AUC = 0.5).
           </p>
           <p>
-            Both models were evaluated using the MFCC-augmented feature set. The Logistic Regression
-            curve is expected to sit slightly higher than Random Forest across most thresholds,
-            consistent with its superior accuracy (92.9% vs. 90.0%) on this dataset.
+            All three models were evaluated using the MFCC-augmented feature set. XGBoost reached
+            the highest accuracy at 92.8%, with Logistic Regression at 91.4% and Random Forest at
+            90.0% — and the ROC curves track that ordering closely.
           </p>
           <p>
             The high AUC values across both classifiers confirm that the feature set — particularly
@@ -531,7 +531,7 @@
           <h4>MFCCs Unlock Class Separation</h4>
           <p>
             The four base features alone topped out at 70% accuracy (Random Forest). Adding
-            13 MFCC coefficients pushed Logistic Regression to 92.9% — confirming that
+            13 MFCC coefficients pushed Logistic Regression to 91.4% (and XGBoost to 92.8%) — confirming that
             timbral texture beyond single spectral statistics is the dominant predictor.
           </p>
         </div>

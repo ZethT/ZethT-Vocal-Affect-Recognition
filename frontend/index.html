@@ -347,7 +347,7 @@
         <div class="meta-divider"></div>
         <div class="meta-item">
           <span class="meta-label">Best Accuracy</span>
-          <span class="meta-value" style="color: var(--color-green);">92.9%</span>
+          <span class="meta-value" style="color: var(--color-green);">92.8%</span>
         </div>
       </div>
     </div>
@@ -476,8 +476,8 @@
       <p class="section-label">Model Results</p>
       <h2>Classification Accuracy</h2>
       <p class="results-sub">
-        Logistic Regression with MFCC features achieved the highest accuracy at 92.9%,
-        a 34-point improvement over the baseline four-feature model.
+        XGBoost reached the highest accuracy at 92.8%, with Logistic Regression close behind at 91.4%.
+        Logistic Regression was selected for deployment for its simplicity and interpretability.
       </p>
 
       <div class="accuracy-row">
@@ -485,17 +485,17 @@
           <div class="acc-model">LR — Base Features</div>
           <div class="acc-value">58.6%</div>
         </div>
-        <div class="accuracy-item">
-          <div class="acc-model">RF — Base Features</div>
-          <div class="acc-value">70.0%</div>
-        </div>
         <div class="accuracy-item best">
           <div class="acc-model">LR + MFCC &mdash; Deployed</div>
-          <div class="acc-value">92.9%</div>
+          <div class="acc-value">91.4%</div>
         </div>
         <div class="accuracy-item">
           <div class="acc-model">RF + MFCC</div>
           <div class="acc-value">90.0%</div>
+        </div>
+        <div class="accuracy-item">
+          <div class="acc-model">XGBoost + MFCC</div>
+          <div class="acc-value">92.8%</div>
         </div>
       </div>
 

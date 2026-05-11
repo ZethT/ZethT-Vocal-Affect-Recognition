@@ -365,8 +365,8 @@
                 <span class="badge badge-green" style="margin-left: 8px; font-size: 10px;">Deployed</span>
               </td>
               <td><span class="acc-val">58.6%</span></td>
-              <td><span class="acc-val acc-best">92.9%</span></td>
-              <td><span class="acc-val" style="color: var(--color-green-dark);">+34.3 pp</span></td>
+              <td><span class="acc-val">91.4%</span></td>
+              <td><span class="acc-val" style="color: var(--color-green-dark);">+32.8 pp</span></td>
             </tr>
             <tr>
               <td><span class="model-name">Random Forest</span></td>
@@ -377,8 +377,8 @@
             <tr>
               <td><span class="model-name">XGBoost</span></td>
               <td><span class="acc-val">—</span></td>
-              <td><span class="acc-val">—</span></td>
-              <td><span class="acc-val" style="color: var(--text-dark-muted); font-size: var(--text-body-xs);">see notebook</span></td>
+              <td><span class="acc-val acc-best">92.8%</span></td>
+              <td><span class="acc-val" style="color: var(--text-dark-muted); font-size: var(--text-body-xs);">highest overall</span></td>
             </tr>
           </tbody>
         </table>
@@ -388,7 +388,7 @@
         <span class="callout-arrow">⚡</span>
         <div class="callout-body">
           <strong>MFCCs were the decisive feature set.</strong> Adding 13 MFCC coefficients
-          raised Logistic Regression accuracy from 58.6% to <strong>92.9%</strong> — a 34.3
+          raised Logistic Regression accuracy from 58.6% to <strong>91.4%</strong> — a 32.8
           percentage-point gain. The base acoustic features (f0, spectral centroid, rolloff, HNR)
           were insufficient on their own; the spectral envelope captured by MFCCs contains the
           information that separates belt from breathy singing.
@@ -588,7 +588,7 @@
           <p>
             Base acoustic features (f0, centroid, rolloff, HNR) alone were insufficient — Logistic
             Regression achieved only 58.6% without them, barely above random on a two-class problem.
-            Adding 13 MFCC coefficients raised accuracy to 92.9%, confirming that vocal technique
+            Adding 13 MFCC coefficients raised accuracy to 91.4%, confirming that vocal technique
             differences are primarily encoded in the spectral envelope shape, not in raw pitch or
             brightness alone.
           </p>
@@ -596,13 +596,14 @@
 
         <div class="conclusion-card">
           <span class="c-num">Finding 02</span>
-          <h3>A linear model outperformed ensemble methods</h3>
+          <h3>A linear model is competitive with ensemble methods</h3>
           <p>
-            Logistic Regression (92.9%) outperformed Random Forest (90.0%) despite its simplicity.
-            Once MFCCs are included, the classification boundary becomes approximately linear in the
-            17-dimensional feature space — the complex non-linear modeling in Random Forest provides
-            no additional benefit. This also confirms the model is not overfitting to non-linear
-            noise in the training data.
+            XGBoost achieved the highest accuracy at 92.8%, with Logistic Regression close behind at
+            91.4% and Random Forest at 90.0%. The 1.4-point gap between the simplest and most complex
+            model is small — once MFCCs are included, the classification boundary is largely linear
+            in the 17-dimensional feature space. Logistic Regression was selected for deployment
+            because it offers nearly the same accuracy with far greater interpretability and a
+            smaller serving footprint.
           </p>
         </div>
 
@@ -622,7 +623,7 @@
           <span class="c-num">Finding 04</span>
           <h3>Vocal technique reliably encodes arousal level</h3>
           <p>
-            A 92.9% accuracy on VocalSet's belt vs. breathy distinction validates the core thesis:
+            Reaching 92.8% accuracy on VocalSet's belt vs. breathy distinction validates the core thesis:
             singing technique carries consistent, extractable acoustic markers of vocal arousal.
             Belt singing (high energy/effort) and breathy singing (low energy/air-dominant) are
             separable in the MFCC feature space with high confidence, supporting the use of

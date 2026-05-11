@@ -6,6 +6,7 @@ Routes:
     POST /predict  — accepts a .wav upload, returns prediction JSON
 """
 
+import logging
 import os
 import tempfile
 
@@ -14,6 +15,9 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from features import extract_features
 from model import predict
+from firestore_client import save_prediction
+
+logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Vocal Affect Recognition API")
 
@@ -49,6 +53,20 @@ async def predict_endpoint(file: UploadFile = File(...)):
         os.unlink(tmp_path)
 
     result = predict(features)
+
+    # Persist to Firestore — fail soft so a DB error never breaks the demo
+    try:
+        save_prediction({
+            "label": result["label"],
+            "confidence": result["confidence"],
+            "probabilities": result["probabilities"],
+            "f0": features["f0"],
+            "spectral_centroid": features["spectral_centroid"],
+            "spectral_rolloff": features["spectral_rolloff"],
+            "hnr": features["hnr"],
+        })
+    except Exception as e:
+        logger.warning("Firestore save_prediction failed: %s", e)
 
     return {
         **result,

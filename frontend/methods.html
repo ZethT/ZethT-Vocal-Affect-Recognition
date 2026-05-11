@@ -460,7 +460,7 @@
           <div class="spec-desc">
             Mel-Frequency Cepstral Coefficients computed on a Mel-scaled filterbank.
             Each coefficient is averaged across frames. Captures the spectral envelope shape
-            at multiple scales of resolution — the feature set that drove accuracy from 70% to 92.9%.
+            at multiple scales of resolution — the feature set that drove accuracy from 70% to 92.8%.
           </div>
         </div>
       </div>
@@ -488,8 +488,9 @@
             A <code>StandardScaler</code> is embedded in a scikit-learn <code>Pipeline</code>
             to prevent data leakage. Used as the interpretable baseline and final deployed model —
             coefficients directly show each feature's direction and magnitude of influence.
-            Adding MFCCs pushed its accuracy from 58.6% to <strong>92.9%</strong>, the highest
-            of any model tested.
+            Adding MFCCs pushed its accuracy from 58.6% to <strong>91.4%</strong> — within 1.4
+            points of the top-performing XGBoost model, and chosen for deployment over XGBoost
+            for its simplicity and interpretability.
           </p>
           <div class="model-params">
             <div class="model-param">
@@ -502,7 +503,7 @@
             </div>
             <div class="model-param">
               <span class="param-key">Accuracy (+ MFCC)</span>
-              <span class="param-val" style="color: var(--color-green-dark); font-weight: 700;">92.9%</span>
+              <span class="param-val" style="color: var(--color-green-dark); font-weight: 700;">91.4%</span>
             </div>
           </div>
         </div>
@@ -557,6 +558,10 @@
             <div class="model-param">
               <span class="param-key">eval_metric</span>
               <span class="param-val">logloss</span>
+            </div>
+            <div class="model-param">
+              <span class="param-key">Accuracy (+ MFCC)</span>
+              <span class="param-val" style="color: var(--color-green-dark); font-weight: 700;">92.8%</span>
             </div>
           </div>
         </div>
