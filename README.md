@@ -17,8 +17,8 @@
 This project addresses the challenge of automatically identifying the "energy" of a vocal performance using machine learning. By analyzing the **VocalSet** dataset—a collection of professional singer recordings—the pipeline transforms raw audio into a feature-rich dataset to distinguish between high-intensity and low-intensity vocalizations.
 
 **The Classification Logic:**
-* **High Energy:** Includes techniques like **Belt** and **Vibrato**.
-* **Low Energy:** Includes techniques like **Breathy**, **Straight**, and **Vocal Fry**.
+* **High Energy:** **Belt**
+* **Low Energy:** **Breathy**
 
 By leveraging **Mel-Frequency Cepstral Coefficients (MFCCs)** alongside traditional spectral features (F0, Spectral Centroid, Spectral Rolloff, HNR), the model successfully captures the timbral nuances that distinguish forceful singing from breathy or fry-based vocalizations.
 
@@ -29,6 +29,27 @@ By leveraging **Mel-Frequency Cepstral Coefficients (MFCCs)** alongside traditio
 ├── vocal_features.csv
 ├── README.md
 ```
+
+## Built With
+
+### Languages
+* ![Python](https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white)
+* ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black)
+* ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white)
+* ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=white)
+
+### Libraries & Frameworks
+* ![Flask](https://img.shields.io/badge/Flask-000000?style=flat&logo=flask&logoColor=white) - Web Backend
+* ![Scikit-Learn](https://img.shields.io/badge/scikit--learn-F7931E?style=flat&logo=scikit-learn&logoColor=white) - Machine Learning Model
+* ![Librosa](https://img.shields.io/badge/Librosa-lightgrey?style=flat) - Audio Feature Extraction
+* ![Pandas](https://img.shields.io/badge/Pandas-150458?style=flat&logo=pandas&logoColor=white) - Data Manipulation
+* ![NumPy](https://img.shields.io/badge/NumPy-013243?style=flat&logo=numpy&logoColor=white) - Numerical Processing
+
+### Infrastructure & Deployment
+* ![Google Cloud](https://img.shields.io/badge/Google_Cloud-4285F4?style=flat&logo=google-cloud&logoColor=white) - Hosting (App Engine/Cloud Run)
+* ![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=flat&logo=firebase&logoColor=black) - Firestore Database
+* ![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white) - Containerization
+* ![Gunicorn](https://img.shields.io/badge/Gunicorn-499848?style=flat&logo=gunicorn&logoColor=white) - WSGI Server
 
 ## Getting Started
 
