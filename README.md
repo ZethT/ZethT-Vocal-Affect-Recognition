@@ -1,7 +1,7 @@
 <a name="readme-top"></a>
 <br />
 <div align="center">
-  <h3 align="center">Vocal-Affect-Recognition</h3>
+  <h3 align="center">Vocal Affect Recognition</h3>
 
   <p align="center">
     An automated machine learning pipeline for classifying vocal audio excerpts into high and low energy categories using Digital Signal Processing (DSP) and ensemble modeling.
