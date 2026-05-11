@@ -33,18 +33,9 @@ _Below is an example of how you can instruct your audience on installing and set
 
 1. Clone the repo
    ```sh
-   git clone https://github.com/zamaniali1995/ml-pipeline.git
+   git clone [https://github.com/yourusername/vocalset-classification.git](https://github.com/yourusername/vocalset-classification.git)
    ```
 2. Setup the conda environment using MakeFile
    ```make
    make create-env
-   ```
-3. Activate the newly created conda environment
-   ```make
-   conda activate ml-env
-   ```
-
-3. Create package
-   ```make
-   create-package
    ```
