@@ -524,7 +524,53 @@
     </div>
   </section>
 
-  <!-- ── 4. ROC CURVES ────────────────────────────────────── -->
+  <!-- ── 4. PCA ANALYSIS ──────────────────────────────────── -->
+  <section class="figure-section section-light">
+    <div class="container">
+      <span class="section-label">Dimensionality Reduction</span>
+      <h2 style="color: var(--text-dark-primary); margin-bottom: var(--space-md);">PCA — 2D Feature Projection</h2>
+      <p class="prose-body" style="margin-bottom: 0;">
+        PCA was applied to the four base acoustic features after z-score normalization to visualize
+        class separability in reduced feature space — and to surface collinearity between features
+        before modeling.
+      </p>
+
+      <div class="figure-grid" style="grid-template-columns: 1fr 1fr; align-items: start; margin-top: var(--space-xl);">
+        <div class="figure-block">
+          <div class="figure-img-wrap">
+            <img src="assets/pca_scatter.png" alt="PCA 2D scatter plot of belt and breathy classes"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+            <div class="img-placeholder" style="display:none;">
+              <span class="placeholder-icon">📊</span>
+              <p>pca_scatter.png</p>
+            </div>
+          </div>
+          <p class="figure-caption"><strong>Figure 4.</strong> PCA Scatter (PC1 vs. PC2) — base acoustic features, z-score normalized</p>
+        </div>
+
+        <div style="padding-top: var(--space-sm);">
+          <h3 style="color: var(--text-dark-primary); margin-bottom: var(--space-md); font-size: var(--text-body-lg);">Interpretation</h3>
+          <p class="figure-interp">
+            PC1 captures the shared variance between spectral centroid and spectral rolloff — which
+            correlate at r = 0.89 — effectively collapsing the two redundant brightness features into
+            a single axis. PC2 separates along HNR and f0.
+          </p>
+          <p class="figure-interp" style="margin-top: var(--space-md);">
+            Partial overlap between the belt and breathy clusters in 2D confirms that the four base
+            features alone are insufficient for clean linear separation. This motivates the addition
+            of MFCC features, which encode timbral texture not visible in single spectral statistics.
+          </p>
+          <p class="figure-interp" style="margin-top: var(--space-md);">
+            The collinearity resolved by PCA also explains why spectral centroid and rolloff each
+            contribute only ~4–6% of Random Forest feature importance despite being acoustically
+            meaningful — they carry redundant information.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 5. ROC CURVES ────────────────────────────────────── -->
   <section class="figure-section section-light-alt">
     <div class="container">
       <span class="section-label">Discrimination Ability</span>
@@ -571,7 +617,7 @@
     </div>
   </section>
 
-  <!-- ── 5. KEY CONCLUSIONS ────────────────────────────────── -->
+  <!-- ── 6. KEY CONCLUSIONS ────────────────────────────────── -->
   <section class="prose-section section-dark-alt">
     <div class="container">
       <span class="section-label">Conclusions</span>

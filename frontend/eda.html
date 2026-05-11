@@ -246,6 +246,114 @@
       line-height: 1.6;
     }
 
+    /* ── Data cleaning pipeline ──────────────────────────── */
+    .pipeline-section {
+      padding-block: var(--space-xxl);
+    }
+
+    .pipeline-steps {
+      display: flex;
+      align-items: stretch;
+      gap: var(--space-md);
+      margin-top: var(--space-xl);
+      margin-bottom: var(--space-lg);
+    }
+
+    .pipeline-connector {
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+      padding-top: 2px;
+    }
+
+    .pipeline-connector svg {
+      width: 20px;
+      height: 20px;
+      color: var(--color-purple-light);
+      opacity: 0.7;
+    }
+
+    .pipeline-step {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .step-box {
+      height: 100%;
+      padding: var(--space-lg) var(--space-md);
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      background: #171425;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+
+    .step-box.step-start {
+      border-color: rgba(122, 0, 255, 0.45);
+      box-shadow: 0 0 24px rgba(122, 0, 255, 0.18);
+    }
+
+    .step-box.step-end {
+      border-color: rgba(120, 255, 30, 0.45);
+      box-shadow: 0 0 24px rgba(120, 255, 30, 0.18);
+    }
+
+    .step-num {
+      font-size: var(--text-body-xs);
+      font-weight: var(--weight-label);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--color-purple-light);
+    }
+
+    .step-end .step-num { color: var(--color-green); }
+
+    .step-title {
+      font-size: var(--text-body-sm);
+      font-weight: var(--weight-heading);
+      color: var(--text-primary);
+      line-height: 1.3;
+    }
+
+    .step-sub {
+      font-size: var(--text-body-xs);
+      color: var(--text-secondary);
+      opacity: 0.7;
+    }
+
+    .step-details {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .step-details li {
+      font-size: var(--text-body-xs);
+      color: var(--text-secondary);
+      line-height: 1.5;
+      display: flex;
+      align-items: baseline;
+      gap: 5px;
+    }
+
+    .step-details li::before {
+      content: "–";
+      color: rgba(255, 77, 109, 0.85);
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .pipeline-caption {
+      font-size: var(--text-body-sm);
+      color: var(--text-secondary);
+      opacity: 0.7;
+      text-align: center;
+    }
+
     /* ── Responsive ─────────────────────────────────────── */
     @media (max-width: 768px) {
       .figure-with-text,
@@ -256,6 +364,16 @@
 
       .insights-grid {
         grid-template-columns: 1fr;
+      }
+
+      .pipeline-steps {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .pipeline-connector {
+        justify-content: center;
+        transform: rotate(90deg);
       }
     }
   </style>
@@ -287,8 +405,8 @@
       </div>
       <h1>Data &amp; Feature Exploration</h1>
       <p class="page-sub">
-        Class distributions, acoustic feature descriptions, PCA dimensionality reduction,
-        and correlation analysis of the VocalSet feature set.
+        Class distributions, acoustic feature descriptions, and correlation analysis
+        of the VocalSet feature set.
       </p>
     </div>
   </section>
@@ -356,7 +474,79 @@
     </div>
   </section>
 
-  <!-- ── 2. FEATURE TABLE ──────────────────────────────────── -->
+  <!-- ── 2. DATA CLEANING PIPELINE ───────────────────────── -->
+  <section class="pipeline-section section-dark-alt">
+    <div class="container">
+      <span class="section-label">Data Cleaning</span>
+      <h2 style="margin-bottom: var(--space-sm);">Data Cleaning Pipeline</h2>
+      <p style="color: var(--text-secondary); font-size: var(--text-body-lg); max-width: 680px; margin-bottom: 0;">
+        Raw audio clips were processed through a four-step pipeline before any modeling was performed.
+      </p>
+
+      <div class="pipeline-steps">
+
+        <div class="pipeline-step">
+          <div class="step-box step-start">
+            <div class="step-num">Step 1</div>
+            <div class="step-title">Raw VocalSet Clips</div>
+          </div>
+        </div>
+
+        <div class="pipeline-connector">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 10h12M12 5l5 5-5 5"/>
+          </svg>
+        </div>
+
+        <div class="pipeline-step">
+          <div class="step-box">
+            <div class="step-num">Step 2</div>
+            <div class="step-title">Feature Extraction</div>
+            <span class="step-sub">librosa + Praat</span>
+          </div>
+        </div>
+
+        <div class="pipeline-connector">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 10h12M12 5l5 5-5 5"/>
+          </svg>
+        </div>
+
+        <div class="pipeline-step">
+          <div class="step-box">
+            <div class="step-num">Step 3</div>
+            <div class="step-title">Invalid Sample Filtering</div>
+            <ul class="step-details">
+              <li>HNR &lt; &minus;20 dB</li>
+              <li>f0 outside 50–500 Hz</li>
+              <li>Zero-valued spectral features</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="pipeline-connector">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 10h12M12 5l5 5-5 5"/>
+          </svg>
+        </div>
+
+        <div class="pipeline-step">
+          <div class="step-box step-end">
+            <div class="step-num">Step 4</div>
+            <div class="step-title">Final Balanced Dataset</div>
+            <span class="step-sub">~750 samples</span>
+          </div>
+        </div>
+
+      </div>
+
+      <p class="pipeline-caption">
+        Quality filtering removed extraction artifacts and non-vocal samples before modeling.
+      </p>
+    </div>
+  </section>
+
+  <!-- ── 3. FEATURE TABLE ──────────────────────────────────── -->
   <section class="feature-table-section section-light-alt">
     <div class="container">
       <span class="section-label">Feature Set</span>
@@ -364,6 +554,8 @@
       <p style="color: var(--text-dark-secondary); font-size: var(--text-body-lg); max-width: 680px; margin-bottom: var(--space-xl);">
         17 features per audio clip: 4 interpretable acoustic features and 13 MFCC coefficients
         capturing timbral texture beyond what single spectral statistics can express.
+        MFCC coefficients approximate how humans perceive timbral texture, allowing the model to
+        capture subtle vocal coloration beyond simple pitch and brightness statistics.
       </p>
       <div class="table-wrapper">
         <table>
@@ -422,87 +614,99 @@
     </div>
   </section>
 
-  <!-- ── 3. PCA ANALYSIS ───────────────────────────────────── -->
+  <!-- ── 4. FEATURE DISTRIBUTIONS ────────────────────────────── -->
   <section class="figure-section section-light">
     <div class="container">
-      <span class="section-label">Dimensionality Reduction</span>
-      <h2 style="color: var(--text-dark-primary); margin-bottom: var(--space-xxl);">PCA — 2D Feature Projection</h2>
-      <div class="figure-with-text">
+      <span class="section-label">Feature Distributions</span>
+      <h2 style="color: var(--text-dark-primary); margin-bottom: var(--space-md);">Acoustic Feature Histograms by Class</h2>
+      <p style="color: var(--text-dark-secondary); font-size: var(--text-body-lg); max-width: 680px; margin-bottom: var(--space-xl);">
+        Per-feature distributions for belt and breathy classes plotted side-by-side. Overlap regions
+        indicate where individual features are insufficient for discrimination; separation indicates
+        discriminative power.
+      </p>
+      <div class="figure-with-text" style="grid-template-columns: 3fr 2fr;">
         <div class="figure-card">
-          <img src="assets/pca_scatter.png" alt="PCA 2D scatter plot of belt and breathy classes" />
+          <img src="assets/eda_hist_features_light_palette.png"
+            alt="Histograms of acoustic features split by belt and breathy class" />
           <p class="figure-caption">
-            <strong>Figure 1 — PCA Scatter (PC1 vs. PC2)</strong><br>
-            Features z-score normalized before decomposition. Points colored by class.
+            <strong>Figure 1 — Feature Distributions (Belt vs. Breathy)</strong><br>
+            Histogram bins colored by class. Features z-score normalized for display.
           </p>
         </div>
         <div class="figure-text">
           <h3>Interpretation</h3>
           <p>
-            PCA was applied to the four base acoustic features (f0, spectral centroid, spectral rolloff,
-            HNR) after z-score normalization to remove unit bias (Hz vs. dB). Two principal components
-            were extracted and plotted.
+            f0 and HNR show the clearest class separation — belt vocals cluster at higher fundamental
+            frequencies and higher harmonic-to-noise ratios, consistent with the chest-dominant
+            phonation mechanism.
           </p>
           <p>
-            The scatter plot reveals partial separation between the belt (high-energy) and breathy
-            (low-energy) clusters in reduced feature space. PC1 is expected to capture the shared
-            variance between spectral centroid and spectral rolloff — which correlate at r = 0.89 —
-            while PC2 separates along HNR and f0 axes.
+            Spectral centroid and rolloff distributions largely overlap between classes, confirming
+            they are weaker individual discriminators. Their utility to the model is further limited
+            by their near-redundancy (r = 0.89).
           </p>
           <p>
-            Complete overlap in some regions confirms that the four base features alone are insufficient
-            for clean classification (70% RF accuracy), motivating the addition of MFCC features which
-            capture timbral texture beyond what single spectral statistics convey.
+            The MFCC coefficients — particularly mfcc_0 (log energy) and mfcc_1 — show strong
+            bimodal distributions, with the two classes peaking in distinct regions. This is the
+            primary driver of the accuracy jump from 70% to 92.8% when MFCCs are added.
           </p>
           <div class="finding-note">
-            Spectral centroid and spectral rolloff move together 89% of the time (r = 0.89), meaning
-            they carry nearly redundant information. PCA resolves this collinearity by collapsing them
-            into an independent component.
+            Each histogram uses the same y-axis scale per feature to allow direct visual comparison
+            of class density. Classes are approximately balanced (~52% belt, ~48% breathy).
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ── 4. ROC CURVES ─────────────────────────────────────── -->
+  <!-- ── 5. CORRELATION HEATMAP ─────────────────────────────── -->
   <section class="figure-section section-light-alt">
     <div class="container">
-      <span class="section-label">Model Separability</span>
-      <h2 style="color: var(--text-dark-primary); margin-bottom: var(--space-xxl);">ROC Curves — All Models</h2>
+      <span class="section-label">Feature Correlation</span>
+      <h2 style="color: var(--text-dark-primary); margin-bottom: var(--space-md);">Correlation Heatmap</h2>
+      <p style="color: var(--text-dark-secondary); font-size: var(--text-body-lg); max-width: 680px; margin-bottom: var(--space-xl);">
+        Pearson correlation matrix across the four primary acoustic features. High off-diagonal
+        values indicate redundancy; near-zero values indicate orthogonal, independent signal.
+      </p>
       <div class="figure-with-text reverse">
         <div class="figure-card">
-          <img src="assets/roc_curves.png" alt="ROC curves for Logistic Regression and Random Forest" />
+          <img src="assets/eda_heatmap_clean.png"
+            alt="Pearson correlation heatmap of all 17 acoustic features" />
           <p class="figure-caption">
-            <strong>Figure 2 — ROC Curves</strong> (Logistic Regression &amp; Random Forest)<br>
-            AUC shown in legend. Higher AUC = better class discrimination across all thresholds.
+            <strong>Figure 2 — Pearson Correlation Heatmap (17 features)</strong><br>
+            Values range from &minus;1 (inverse) to +1 (perfect correlation). White = no correlation.
           </p>
         </div>
         <div class="figure-text">
           <h3>Interpretation</h3>
           <p>
-            ROC curves plot the true positive rate against the false positive rate at every
-            classification threshold. A model with perfect discrimination traces the top-left corner
-            (AUC = 1.0); random guessing follows the diagonal (AUC = 0.5).
+            The strongest off-diagonal correlation is between <strong>spectral_centroid</strong> and
+            <strong>spectral_rolloff</strong> (r = 0.89). Both features measure spectral brightness
+            and carry nearly identical information — motivating the collinearity analysis in the PCA
+            section of the Findings page.
           </p>
           <p>
-            All three models were evaluated using the MFCC-augmented feature set. XGBoost reached
-            the highest accuracy at 92.8%, with Logistic Regression at 91.4% and Random Forest at
-            90.0% — and the ROC curves track that ordering closely.
+            Consecutive MFCC coefficients (e.g. mfcc_1 and mfcc_2) show moderate positive correlation,
+            which is expected given the overlapping Mel filterbank basis functions. Despite this,
+            each coefficient captures a distinct scale of timbral texture and the aggregate set
+            provides strong discriminative power.
           </p>
           <p>
-            The high AUC values across both classifiers confirm that the feature set — particularly
-            the MFCC coefficients — provides strong signal for separating belt from breathy vocal technique.
+            f0 and HNR are weakly correlated with the MFCC block, confirming they contribute
+            independent acoustic information that complements the spectral envelope captured by MFCCs.
+            Correlation values are reported using Pearson's r coefficient.
           </p>
           <div class="finding-note">
-            These curves were generated on the held-out 20% test split (stratified), using
-            <code>RocCurveDisplay.from_predictions</code> from scikit-learn. The positive class
-            is <em>high_energy</em> (belt).
+            High intra-MFCC correlation is not a problem here — it reflects the physics of the Mel
+            filterbank, not measurement redundancy. Regularized models like Logistic Regression
+            handle this gracefully.
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ── 5. KEY INSIGHTS ───────────────────────────────────── -->
+  <!-- ── 6. KEY INSIGHTS ──────────────────────────────────── -->
   <section class="insights-section section-dark-alt">
     <div class="container">
       <span class="section-label">Key EDA Findings</span>

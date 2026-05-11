@@ -222,6 +222,92 @@
       font-family: 'Courier New', monospace;
     }
 
+    /* ── Train/test split strip ──────────────────────────── */
+    .split-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-md);
+      margin-top: var(--space-xl);
+      margin-bottom: var(--space-xl);
+    }
+
+    .split-chip {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding: var(--space-md) var(--space-lg);
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+    }
+
+    .split-chip .chip-val {
+      font-size: var(--text-body-sm);
+      font-weight: var(--weight-heading);
+      color: var(--text-dark-primary);
+      font-family: 'Courier New', monospace;
+    }
+
+    .split-chip .chip-lbl {
+      font-size: var(--text-body-xs);
+      font-weight: var(--weight-label);
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--text-dark-muted);
+    }
+
+    /* ── Feature scaling note ────────────────────────────── */
+    .scaling-note {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-md);
+      max-width: 720px;
+      margin-top: var(--space-xl);
+      padding: var(--space-md) var(--space-lg);
+      background: rgba(122, 0, 255, 0.05);
+      border-left: 3px solid var(--color-purple);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    }
+
+    .scaling-note .note-label {
+      font-size: var(--text-body-xs);
+      font-weight: var(--weight-label);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--color-purple);
+      white-space: nowrap;
+      padding-top: 2px;
+    }
+
+    .scaling-note p {
+      font-size: var(--text-body-sm);
+      color: var(--text-dark-secondary);
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    /* ── Inline figure (methods page) ────────────────────── */
+    .methods-figure {
+      margin-top: var(--space-xl);
+      max-width: 680px;
+    }
+
+    .methods-figure img {
+      width: 100%;
+      height: auto;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-light);
+      background: #F4F4F8;
+      display: block;
+    }
+
+    .methods-figure .fig-caption {
+      margin-top: var(--space-sm);
+      font-size: var(--text-body-xs);
+      color: var(--text-dark-muted);
+      line-height: 1.5;
+    }
+
     /* ── Evaluation metrics ──────────────────────────────── */
     .metrics-grid {
       display: grid;
@@ -459,10 +545,23 @@
           </div>
           <div class="spec-desc">
             Mel-Frequency Cepstral Coefficients computed on a Mel-scaled filterbank.
-            Each coefficient is averaged across frames. Captures the spectral envelope shape
-            at multiple scales of resolution — the feature set that drove accuracy from 70% to 92.8%.
+            Each coefficient is averaged across frames. MFCCs were included because raw spectral
+            statistics alone cannot capture detailed vocal timbre structure and harmonic envelope
+            shape — they capture the spectral envelope at multiple scales of resolution and are the
+            feature set that drove accuracy from 70% to 92.8%.
           </div>
         </div>
+      </div>
+
+      <div class="scaling-note">
+        <span class="note-label">Feature Scaling</span>
+        <p>
+          Features were z-score normalized before training using <code>StandardScaler</code>
+          to prevent unit dominance (Hz vs. dB scales) and improve gradient convergence for
+          linear models. The scaler is embedded inside a scikit-learn <code>Pipeline</code>
+          so normalization parameters are fit only on training data and applied consistently
+          at inference time.
+        </p>
       </div>
     </div>
   </section>
@@ -473,10 +572,28 @@
       <span class="section-label">Model Comparison</span>
       <h2 style="color: var(--text-dark-primary); margin-bottom: var(--space-sm);">Classifiers Evaluated</h2>
       <p style="color: var(--text-dark-secondary); font-size: var(--text-body-lg); max-width: 680px; margin-bottom: 0;">
-        Each model was trained on an 80/20 stratified train-test split (random_state = 42)
-        and evaluated on the held-out test set. All three were tested on both the
-        base four-feature set and the MFCC-augmented 17-feature set.
+        Each model was trained and evaluated on the same held-out split. All three were
+        tested on both the base four-feature set and the MFCC-augmented 17-feature set.
       </p>
+
+      <div class="split-strip">
+        <div class="split-chip">
+          <span class="chip-val">80 / 20</span>
+          <span class="chip-lbl">Train / Test Split</span>
+        </div>
+        <div class="split-chip">
+          <span class="chip-val">random_state = 42</span>
+          <span class="chip-lbl">Reproducibility Seed</span>
+        </div>
+        <div class="split-chip">
+          <span class="chip-val">Stratified</span>
+          <span class="chip-lbl">Class Balance Preserved</span>
+        </div>
+        <div class="split-chip">
+          <span class="chip-val">No Singer Grouping</span>
+          <span class="chip-lbl">Split Strategy</span>
+        </div>
+      </div>
 
       <div class="model-grid">
 
@@ -488,9 +605,11 @@
             A <code>StandardScaler</code> is embedded in a scikit-learn <code>Pipeline</code>
             to prevent data leakage. Used as the interpretable baseline and final deployed model —
             coefficients directly show each feature's direction and magnitude of influence.
-            Adding MFCCs pushed its accuracy from 58.6% to <strong>91.4%</strong> — within 1.4
-            points of the top-performing XGBoost model, and chosen for deployment over XGBoost
-            for its simplicity and interpretability.
+            Adding MFCCs pushed its accuracy from 58.6% to <strong>91.4%</strong>. Although
+            XGBoost achieved slightly higher accuracy (92.8%), Logistic Regression was selected
+            for deployment because it offered comparable performance with lower inference complexity,
+            easier interpretability via model coefficients, and more stable probability calibration
+            on this small, clean feature set.
           </p>
           <div class="model-params">
             <div class="model-param">
@@ -509,7 +628,7 @@
         </div>
 
         <div class="card card-light model-card">
-          <span class="badge badge-lavender model-tag">Comparison</span>
+          <span class="badge badge-purple model-tag">Comparison</span>
           <h3>Random Forest</h3>
           <p>
             Ensemble of 100 decision trees, each trained on a random feature and sample
@@ -536,7 +655,7 @@
         </div>
 
         <div class="card card-light model-card">
-          <span class="badge badge-lavender model-tag">Comparison</span>
+          <span class="badge badge-purple model-tag">Comparison</span>
           <h3>XGBoost</h3>
           <p>
             Gradient-boosted trees that sequentially correct prior errors. Each new tree
@@ -574,7 +693,7 @@
   <section class="prose-section section-light-alt">
     <div class="container">
       <span class="section-label">Evaluation</span>
-      <h2 style="color: var(--text-dark-primary); margin-bottom: var(--space-xl);">Metrics Used</h2>
+      <h2 style="color: var(--text-dark-primary); margin-bottom: var(--space-xl);">Performance Metrics</h2>
       <div class="metrics-grid">
         <div class="metric-def">
           <h4>Accuracy</h4>
@@ -609,54 +728,7 @@
           </p>
         </div>
       </div>
-    </div>
-  </section>
 
-  <!-- ── 5. SYSTEM ARCHITECTURE ───────────────────────────── -->
-  <section class="arch-section section-dark-alt">
-    <div class="container">
-      <span class="section-label">System Architecture</span>
-      <h2 style="margin-bottom: var(--space-md);">Deployment Design</h2>
-      <p style="color: var(--text-secondary); font-size: var(--text-body-lg); max-width: 620px; margin-bottom: var(--space-xxl);">
-        The trained model is served as a containerized FastAPI application.
-        Prediction metadata is persisted to Firestore. The static frontend is
-        hosted separately on App Engine and communicates with the inference
-        service via <code>fetch()</code>.
-      </p>
-
-      <div class="arch-flow">
-        <div class="arch-row">
-          <span class="arch-icon">🌐</span>
-          <div>
-            <div class="arch-label">Frontend — Google App Engine</div>
-            <div class="arch-sub">Static HTML/CSS/JS · uploads .wav via fetch()</div>
-          </div>
-        </div>
-        <div class="arch-arrow">↓ POST /predict (multipart/form-data)</div>
-        <div class="arch-row">
-          <span class="arch-icon">⚙️</span>
-          <div>
-            <div class="arch-label">FastAPI Inference Service — Google Cloud Run</div>
-            <div class="arch-sub">Docker container · librosa + parselmouth + scikit-learn</div>
-          </div>
-        </div>
-        <div class="arch-arrow">↓ feature extraction → model.predict_proba()</div>
-        <div class="arch-row">
-          <span class="arch-icon">🤖</span>
-          <div>
-            <div class="arch-label">Logistic Regression Model</div>
-            <div class="arch-sub">vocal_model_lr.joblib · StandardScaler + LogisticRegression</div>
-          </div>
-        </div>
-        <div class="arch-arrow">↓ prediction JSON returned to frontend</div>
-        <div class="arch-row">
-          <span class="arch-icon">🗄️</span>
-          <div>
-            <div class="arch-label">Firestore — Google Cloud</div>
-            <div class="arch-sub">Prediction metadata stored · label, confidence, features, timestamp</div>
-          </div>
-        </div>
-      </div>
     </div>
   </section>
 
