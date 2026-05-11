@@ -26,3 +26,25 @@ By leveraging **Mel-Frequency Cepstral Coefficients (MFCCs)** alongside traditio
 .
 ├── vocal_features.csv
 ├── README.md
+```
+### Installation
+
+_Below is an example of how you can instruct your audience on installing and setting up your app. This template doesn't rely on any external dependencies or services._
+
+1. Clone the repo
+   ```sh
+   git clone https://github.com/zamaniali1995/ml-pipeline.git
+   ```
+2. Setup the conda environment using MakeFile
+   ```make
+   make create-env
+   ```
+3. Activate the newly created conda environment
+   ```make
+   conda activate ml-env
+   ```
+
+3. Create package
+   ```make
+   create-package
+   ```
