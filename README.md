@@ -24,17 +24,5 @@ By leveraging **Mel-Frequency Cepstral Coefficients (MFCCs)** alongside traditio
 
 ```text
 .
-├── CS_163_Project.ipynb      # Main development notebook (Data processing, EDA, Training)
-├── vocal_features.csv        # Processed dataset with 17 extracted audio features
-├── feature_names.joblib      # Serialized list of feature names for model consistency
-├── vocal_model_lr.joblib     # Trained Logistic Regression pipeline (Best Model)
-├── vocal_model_rf.joblib     # Trained Random Forest classifier
-├── README.md                 # Project documentation
-├── cs163-final-rubric.pdf    # Project grading criteria
-└── images/                   # Visualizations generated during training
-    ├── image_285215.png      # Confusion Matrix
-    ├── image_28007e.png      # Feature Importance/Correlation plot
-    ├── image_28003f.png      # ROC Curve
-    ├── image_27fc3c.png      # Spectral Analysis plot
-    ├── image_27fc22.png      # Feature Distribution
-    └── image_27fc05.png      # Model comparison chart
+├── vocal_features.csv
+├── README.md
