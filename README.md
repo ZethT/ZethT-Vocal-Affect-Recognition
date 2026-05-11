@@ -6,6 +6,8 @@
   <p align="center">
     An automated machine learning pipeline for classifying vocal audio excerpts into high and low energy categories using Digital Signal Processing (DSP) and ensemble modeling.
     <br />
+    <a href="https://vocalaffect.uc.r.appspot.com/index.html"><strong>Explore the website »</strong></a>
+    <br />
     <br />
   </p>
 </div>
@@ -27,6 +29,10 @@ By leveraging **Mel-Frequency Cepstral Coefficients (MFCCs)** alongside traditio
 ├── vocal_features.csv
 ├── README.md
 ```
+
+## Getting Started
+
+Here we will describe the necessary actions and steps that should be followed in order to run this pipeline.
 
 ### Prerequisites
 
