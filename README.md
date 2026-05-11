@@ -27,6 +27,14 @@ By leveraging **Mel-Frequency Cepstral Coefficients (MFCCs)** alongside traditio
 ├── vocal_features.csv
 ├── README.md
 ```
+
+### Prerequisites
+
+You will need Python 3.12+ and the following packages:
+```sh
+pip install librosa pandas numpy scikit-learn xgboost joblib matplotlib seaborn
+```
+
 ### Installation
 
 _Below is an example of how you can instruct your audience on installing and setting up your app. This template doesn't rely on any external dependencies or services._
