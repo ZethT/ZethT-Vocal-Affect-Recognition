@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Live Demo — Vocal Affect Recognition</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* ── Page header ─────────────────────────────────────── */
+    .page-header {
+      background:
+        radial-gradient(ellipse 60% 80% at 50% 30%, rgba(122, 0, 255, 0.2) 0%, transparent 65%),
+        var(--bg-dark);
+      padding: var(--space-xxl) 0 var(--space-xl);
+      text-align: center;
+    }
+
+    .page-header h1 {
+      font-size: clamp(32px, 5vw, 56px);
+      letter-spacing: -0.04em;
+      margin-bottom: var(--space-md);
+    }
+
+    .page-header .page-sub {
+      font-size: var(--text-body-lg);
+      color: var(--text-secondary);
+      max-width: 620px;
+      margin-inline: auto;
+    }
+
+    /* ── Demo section ────────────────────────────────────── */
+    .demo-section { padding-block: var(--space-xxl); }
+
+    .demo-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-xl);
+      align-items: start;
+    }
+
+    .demo-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+    }
+
+    .demo-card h2 {
+      color: var(--text-dark-primary);
+      font-size: var(--text-body-lg);
+      margin-bottom: var(--space-md);
+    }
+
+    .demo-card .card-sub {
+      font-size: var(--text-body-sm);
+      color: var(--text-dark-secondary);
+      line-height: 1.6;
+      margin-bottom: var(--space-lg);
+    }
+
+    /* ── File picker ─────────────────────────────────────── */
+    .file-picker {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-md);
+      border: 2px dashed var(--border-light);
+      border-radius: var(--radius-md);
+      padding: var(--space-xl);
+      background: #FAFAFC;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .file-picker:hover {
+      border-color: var(--color-purple);
+      background: rgba(122, 0, 255, 0.03);
+    }
+
+    .file-picker input[type="file"] {
+      display: none;
+    }
+
+    .file-picker-label {
+      cursor: pointer;
+      font-size: var(--text-body-sm);
+      color: var(--color-purple);
+      font-weight: var(--weight-label);
+      padding: var(--space-sm) var(--space-md);
+      border: 1px solid var(--color-purple);
+      border-radius: var(--radius-md);
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .file-picker-label:hover {
+      background: var(--color-purple);
+      color: #fff;
+    }
+
+    .file-picker-icon {
+      font-size: 32px;
+      opacity: 0.5;
+    }
+
+    .file-picker-hint {
+      font-size: var(--text-body-xs);
+      color: var(--text-dark-muted);
+    }
+
+    .file-picker.has-file {
+      border-style: solid;
+      border-color: var(--color-green-dark);
+      background: rgba(120, 255, 30, 0.04);
+    }
+
+    .file-name {
+      font-size: var(--text-body-sm);
+      color: var(--text-dark-primary);
+      font-family: 'Courier New', monospace;
+      word-break: break-all;
+      max-width: 100%;
+    }
+
+    /* ── Action row ──────────────────────────────────────── */
+    .action-row {
+      display: flex;
+      gap: var(--space-md);
+      align-items: center;
+      margin-top: var(--space-lg);
+    }
+
+    .action-row button {
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: var(--weight-label);
+    }
+
+    .action-row button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    /* ── Result panel ────────────────────────────────────── */
+    .result-panel {
+      min-height: 320px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .result-empty {
+      text-align: center;
+      color: var(--text-dark-muted);
+      font-size: var(--text-body-sm);
+    }
+
+    .result-empty .empty-icon {
+      font-size: 40px;
+      display: block;
+      margin-bottom: var(--space-md);
+      opacity: 0.3;
+    }
+
+    .result-content { display: none; width: 100%; }
+    .result-content.visible { display: block; }
+
+    /* ── How it works ───────────────────────────────────── */
+    .how-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-lg);
+      margin-top: var(--space-xl);
+    }
+
+    .how-step {
+      padding: var(--space-lg);
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+    }
+
+    .how-step .step-num {
+      display: inline-block;
+      font-size: var(--text-body-xs);
+      font-weight: var(--weight-heading);
+      color: var(--color-purple);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: var(--space-sm);
+    }
+
+    .how-step h4 {
+      color: var(--text-dark-primary);
+      font-size: var(--text-body-md);
+      margin-bottom: var(--space-sm);
+    }
+
+    .how-step p {
+      font-size: var(--text-body-sm);
+      color: var(--text-dark-secondary);
+      line-height: 1.6;
+    }
+
+    /* ── Result rendering ────────────────────────────────── */
+    .result-header { margin-bottom: var(--space-lg); }
+
+    .result-header h3 {
+      color: var(--text-dark-primary);
+      font-size: var(--text-body-lg);
+      margin-top: var(--space-sm);
+      margin-bottom: var(--space-xs);
+    }
+
+    .result-blurb {
+      font-size: var(--text-body-sm);
+      color: var(--text-dark-secondary);
+      line-height: 1.5;
+      margin-bottom: var(--space-md);
+    }
+
+    .confidence-block {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: var(--space-md) 0;
+      border-top: 1px solid var(--border-light);
+      border-bottom: 1px solid var(--border-light);
+      margin-bottom: var(--space-lg);
+    }
+
+    .confidence-label {
+      font-size: var(--text-body-xs);
+      font-weight: var(--weight-label);
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--text-dark-muted);
+    }
+
+    .confidence-value {
+      font-size: 28px;
+      font-weight: var(--weight-heading);
+      color: var(--text-dark-primary);
+      letter-spacing: -0.02em;
+    }
+
+    /* Light-theme override for prob bars (default style.css is dark) */
+    .prob-bar-group--light .prob-bar-label {
+      color: var(--text-dark-primary);
+    }
+
+    .prob-bar-group--light .prob-bar-track {
+      background: var(--border-light);
+    }
+
+    .prob-bar-fill.breathy {
+      background: var(--color-purple-light);
+    }
+
+    .features-details {
+      margin-top: var(--space-lg);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      background: #FAFAFC;
+    }
+
+    .features-details summary {
+      cursor: pointer;
+      font-size: var(--text-body-sm);
+      font-weight: var(--weight-label);
+      color: var(--color-purple);
+    }
+
+    .features-table {
+      width: 100%;
+      margin-top: var(--space-md);
+      font-size: var(--text-body-sm);
+      border-collapse: collapse;
+    }
+
+    .features-table td {
+      padding: 6px 0;
+      border-bottom: 1px solid var(--border-light);
+      color: var(--text-dark-secondary);
+    }
+
+    .features-table tr:last-child td { border-bottom: none; }
+
+    .features-table td:last-child {
+      text-align: right;
+      font-family: 'Courier New', monospace;
+      color: var(--text-dark-primary);
+    }
+
+    /* ── Loading spinner ─────────────────────────────────── */
+    .demo-loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-md);
+      padding: var(--space-xxl) 0;
+      color: var(--text-dark-muted);
+      font-size: var(--text-body-sm);
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--border-light);
+      border-top-color: var(--color-purple);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Error state ─────────────────────────────────────── */
+    .demo-error {
+      text-align: center;
+      padding: var(--space-lg) 0;
+    }
+
+    .demo-error-icon {
+      font-size: 32px;
+      display: block;
+      margin-bottom: var(--space-sm);
+    }
+
+    .demo-error h3 {
+      color: var(--text-dark-primary);
+      font-size: var(--text-body-lg);
+      margin-bottom: var(--space-sm);
+    }
+
+    .demo-error p {
+      font-size: var(--text-body-sm);
+      color: var(--text-dark-secondary);
+      line-height: 1.5;
+      max-width: 360px;
+      margin-inline: auto;
+    }
+
+    /* ── Responsive ─────────────────────────────────────── */
+    @media (max-width: 1024px) {
+      .demo-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 768px) {
+      .how-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── NAV ─────────────────────────────────────────────── -->
+  <div class="nav-wrapper">
+    <nav class="nav">
+      <a href="index.html" class="nav-logo">Vocal<span>Affect</span></a>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="eda.html">EDA</a></li>
+        <li><a href="methods.html">Methods</a></li>
+        <li><a href="findings.html">Findings</a></li>
+        <li><a href="demo.html">Live Demo</a></li>
+      </ul>
+      <div class="nav-cta">
+        <a href="demo.html" class="btn btn-primary">Inference Demo</a>
+      </div>
+    </nav>
+  </div>
+
+  <!-- ── PAGE HEADER ──────────────────────────────────────── -->
+  <section class="page-header">
+    <div class="container">
+      <div style="margin-bottom: var(--space-md);">
+        <span class="badge badge-green">Live Inference</span>
+      </div>
+      <h1>Try the Classifier</h1>
+      <p class="page-sub">
+        Upload a short <code>.wav</code> singing sample. The audio is sent to our
+        Logistic Regression model running on Google Cloud Run, which extracts
+        17 acoustic features and predicts whether the vocal technique is
+        <strong>belt</strong> (high energy) or <strong>breathy</strong> (low energy).
+      </p>
+    </div>
+  </section>
+
+  <!-- ── DEMO ────────────────────────────────────────────── -->
+  <section class="demo-section section-light">
+    <div class="container">
+      <div class="demo-grid">
+
+        <!-- LEFT: Upload card -->
+        <div class="demo-card">
+          <h2>Upload Audio</h2>
+          <p class="card-sub">
+            A clean singing sample of 1–4 seconds works best. Speech, silence,
+            or non-vocal audio will be rejected by the validation step.
+          </p>
+
+          <div class="file-picker" id="filePicker">
+            <span class="file-picker-icon">🎵</span>
+            <label for="audioFile" class="file-picker-label">Choose .wav file</label>
+            <input type="file" id="audioFile" accept=".wav,audio/wav" />
+            <span class="file-picker-hint" id="fileHint">No file selected</span>
+          </div>
+
+          <div class="action-row">
+            <button id="classifyBtn" class="btn btn-primary" disabled>Classify</button>
+            <button id="resetBtn" class="btn btn-secondary">Reset</button>
+          </div>
+        </div>
+
+        <!-- RIGHT: Result card -->
+        <div class="demo-card">
+          <h2>Prediction</h2>
+          <p class="card-sub">
+            Results will appear here after the model finishes inference.
+          </p>
+
+          <div class="result-panel">
+            <div class="result-empty" id="resultEmpty">
+              <span class="empty-icon">📊</span>
+              <p>Awaiting input — choose a file and click <em>Classify</em>.</p>
+            </div>
+            <div class="result-content" id="resultContent">
+              <!-- Populated by demo.js in tasks 5.3–5.6 -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── HOW IT WORKS ────────────────────────────────────── -->
+  <section class="demo-section section-light-alt">
+    <div class="container">
+      <span class="section-label">Behind the Scenes</span>
+      <h2 style="color: var(--text-dark-primary); margin-bottom: var(--space-md);">How It Works</h2>
+      <p style="color: var(--text-dark-secondary); font-size: var(--text-body-lg); max-width: 680px; margin-bottom: 0;">
+        Three steps run server-side on every prediction.
+      </p>
+
+      <div class="how-grid">
+        <div class="how-step">
+          <span class="step-num">Step 01</span>
+          <h4>Feature Extraction</h4>
+          <p>
+            librosa and Praat compute f0, spectral centroid, spectral rolloff,
+            HNR, and 13 MFCC coefficients from the uploaded audio.
+          </p>
+        </div>
+        <div class="how-step">
+          <span class="step-num">Step 02</span>
+          <h4>Validation</h4>
+          <p>
+            Features are checked against valid ranges (f0 ∈ [50, 500] Hz, HNR &ge; &minus;20 dB).
+            Invalid inputs return a 422 error rather than crashing.
+          </p>
+        </div>
+        <div class="how-step">
+          <span class="step-num">Step 03</span>
+          <h4>Classification</h4>
+          <p>
+            The 17-feature vector is passed to the deployed Logistic Regression
+            pipeline (StandardScaler + LR). Returns label, confidence, and class
+            probabilities.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script src="nav.js"></script>
+  <script src="config.js"></script>
+  <script src="demo.js"></script>
+</body>
+</html>
