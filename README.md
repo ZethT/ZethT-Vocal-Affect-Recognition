@@ -22,13 +22,46 @@ This project addresses the challenge of automatically identifying the "energy" o
 
 By leveraging **Mel-Frequency Cepstral Coefficients (MFCCs)** alongside traditional spectral features (F0, Spectral Centroid, Spectral Rolloff, HNR), the model successfully captures the timbral nuances that distinguish forceful singing from breathy or fry-based vocalizations.
 
-## Directory Information
+## Directory Structure
 
 ```text
 .
-├── vocal_features.csv
-├── README.md
+├── backend/        FastAPI inference service + Dockerfile (deployed to Cloud Run)
+├── frontend/       Static website — HTML/CSS/JS (deployed to App Engine)
+├── model/          Trained scikit-learn models (.joblib artifacts)
+├── notebooks/      EDA + model training notebook (CS_163_Project.ipynb)
+├── data/           Processed feature dataset (vocal_features.csv)
+└── docs/           Onboarding, EDA notes, and original assignment deliverables
 ```
+
+## Pipeline
+
+The project flows end-to-end from raw audio to a live web demo:
+
+1. **Data collection** — VocalSet `.wav` recordings (belt + breathy classes).
+2. **Feature extraction** — `notebooks/CS_163_Project.ipynb` computes 17 acoustic features per clip (F0, Spectral Centroid, Spectral Rolloff, HNR, 13 MFCCs).
+3. **Dataset** — Extracted features are written to `data/vocal_features.csv`.
+4. **Training** — The same notebook trains Logistic Regression, Random Forest, and XGBoost on an 80/20 stratified split; the best model is serialized to `model/vocal_model_lr.joblib`.
+5. **Inference** — `backend/` wraps the model in a FastAPI service, containerized via `backend/Dockerfile` for Cloud Run.
+6. **Website** — `frontend/` is a static site served by App Engine; the demo page uploads a `.wav` to the inference service and renders the prediction.
+
+## System Design
+
+```text
+   Browser
+      │
+      ▼
+   App Engine  ──────── serves static HTML/CSS/JS from frontend/
+      │
+      │  (demo.html fetch → /predict)
+      ▼
+   Cloud Run  ───────── FastAPI (Docker) — feature extraction + sklearn inference
+      │
+      ▼
+   Firestore  ───────── prediction logs
+```
+
+**Scalability.** The frontend is static, so App Engine serves it from edge cache with no per-request compute. The inference service is stateless: the model is loaded once at container startup (`backend/model.py`) and each request runs feature extraction + prediction in isolation, which lets Cloud Run autoscale instances horizontally with traffic. Storage is decoupled — Firestore writes are best-effort and never block a response.
 
 ## Built With
 
@@ -39,48 +72,63 @@ By leveraging **Mel-Frequency Cepstral Coefficients (MFCCs)** alongside traditio
 * ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=white)
 
 ### Libraries & Frameworks
-* ![Flask](https://img.shields.io/badge/Flask-000000?style=flat&logo=flask&logoColor=white) - Web Backend
+* ![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=flat&logo=fastapi&logoColor=white) - Inference API
+* ![Uvicorn](https://img.shields.io/badge/Uvicorn-2A9D8F?style=flat) - ASGI server
 * ![Scikit-Learn](https://img.shields.io/badge/scikit--learn-F7931E?style=flat&logo=scikit-learn&logoColor=white) - Machine Learning Model
 * ![Librosa](https://img.shields.io/badge/Librosa-lightgrey?style=flat) - Audio Feature Extraction
 * ![Pandas](https://img.shields.io/badge/Pandas-150458?style=flat&logo=pandas&logoColor=white) - Data Manipulation
 * ![NumPy](https://img.shields.io/badge/NumPy-013243?style=flat&logo=numpy&logoColor=white) - Numerical Processing
 
 ### Infrastructure & Deployment
-* ![Google Cloud](https://img.shields.io/badge/Google_Cloud-4285F4?style=flat&logo=google-cloud&logoColor=white) - Hosting (App Engine/Cloud Run)
+* ![Google Cloud](https://img.shields.io/badge/Google_Cloud-4285F4?style=flat&logo=google-cloud&logoColor=white) - Hosting (App Engine + Cloud Run)
 * ![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=flat&logo=firebase&logoColor=black) - Firestore Database
 * ![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white) - Containerization
-* ![Gunicorn](https://img.shields.io/badge/Gunicorn-499848?style=flat&logo=gunicorn&logoColor=white) - WSGI Server
 
 ## Getting Started
 
-Here we will describe the necessary actions and steps that should be followed in order to run this pipeline.
-
 ### Prerequisites
 
-You will need Python 3.12+ and the following packages:
-```sh
-pip install librosa pandas numpy scikit-learn xgboost joblib matplotlib seaborn
-```
+Python 3.11+ is required (the deployed container is built on `python:3.11-slim`).
 
 ### Installation
 
-_Below is an example of how you can instruct your audience on installing and setting up your app. This template doesn't rely on any external dependencies or services._
-
-1. Clone the repo
+1. Clone the repo:
    ```sh
-   git clone [https://github.com/yourusername/vocalset-classification.git](https://github.com/yourusername/vocalset-classification.git)
+   git clone https://github.com/ZethT/ZethT-Vocal-Affect-Recognition.git
+   cd ZethT-Vocal-Affect-Recognition
    ```
-2. Ensure the VocalSet audio data is present in the `/content/FULL/` directory or update the paths in `CS_163_Project.ipynb`.
-3. Run the notebook to process the audio and generate `vocal_features.csv`.
 
-## Usage
-The pipeline follows a strict machine learning workflow:
-* **Extraction:** `librosa` computes the Fundamental Frequency (F0), Spectral Centroid, Rolloff, HNR, and 13 MFCCs for each audio clip.
-* **Preprocessing:** Data is standardized using a `StandardScaler` within a pipeline to handle the varying scales of frequency vs. coefficient data.
-* **Training:** Multiple models (LogReg, Random Forest, XGBoost) are compared using an 80/20 train-test split.
-* **Validation:** Performance is visualized via confusion matrices and ROC curves to ensure high recall for both energy classes.
+2. Install backend dependencies:
+   ```sh
+   cd backend
+   pip install -r requirements.txt
+   ```
+
+### Running the inference service locally
+
+From the `backend/` directory:
+
+```sh
+uvicorn main:app --host 0.0.0.0 --port 8080
+```
+
+This matches the command in `backend/Dockerfile`.
+
+### Running via Docker
+
+The Dockerfile is built **from the repo root** so it can include `model/` artifacts:
+
+```sh
+docker build -f backend/Dockerfile -t vocal-backend .
+docker run -p 8080:8080 vocal-backend
+```
+
+### Running the notebook
+
+Open `notebooks/CS_163_Project.ipynb` in Jupyter or Google Colab. The notebook handles feature extraction, EDA, and model training; it writes `data/vocal_features.csv` and the `.joblib` artifacts in `model/`.
 
 ## Results
+
 Our analysis proved that MFCCs are critical for energy classification. Adding MFCCs to the baseline spectral features boosted the Logistic Regression model's accuracy from 58.57% to 92.86%.
 
 | Model | Features | Accuracy |
