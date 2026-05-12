@@ -56,7 +56,7 @@ The core question: can a lightweight acoustic classifier distinguish between *be
 │   ├── vocal_model_rf.joblib   # Comparison: Random Forest pipeline
 │   └── feature_names.joblib    # Ordered list of feature names expected by the model
 │
-├── notebooks/
+├── notebook/
 │   └── CS_163_Project.ipynb    # Full ML pipeline: EDA, feature extraction, training, evaluation
 │
 ├── vocal_features.csv          # Extracted feature dataset (output of notebook)
@@ -107,7 +107,7 @@ A static website built with HTML, CSS, and Vanilla JavaScript presents the proje
    pip install librosa praat-parselmouth pandas numpy scikit-learn xgboost joblib matplotlib seaborn
    ```
 
-3. Place the VocalSet audio data in `/content/FULL/` (or update paths in the notebook), then run `notebooks/CS_163_Project.ipynb` from top to bottom to reproduce feature extraction, training, and plot generation.
+3. Place the VocalSet audio data in `/content/FULL/` (or update paths in the notebook), then run `notebook/CS_163_Project.ipynb` from top to bottom to reproduce feature extraction, training, and plot generation.
 
 ### Running the Backend Locally
 
