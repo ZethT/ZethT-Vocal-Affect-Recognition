@@ -857,34 +857,43 @@
       <span class="section-label">Scope &amp; Outlook</span>
       <h2 style="color: var(--text-dark-primary); margin-bottom: var(--space-md);">Limitations &amp; Implications</h2>
       <p class="prose-body" style="margin-bottom: 0;">
-        A brief note on the scope of these results and what they suggest for downstream use.
+        A note on the scope of these results, what they suggest for downstream use, and directions for future work.
       </p>
 
       <div class="note-grid">
+
         <div class="note-card note-implication">
-          <span class="note-label">Practical Implication</span>
+          <span class="note-label">Practical Implications</span>
+          <p style="margin-bottom: var(--space-md);">
+            These results suggest that vocal energy can be estimated using lightweight acoustic
+            classifiers rather than requiring large deep neural architectures. Because the deployed
+            model uses a small set of interpretable acoustic features, it can support fast inference
+            for real-time or low-resource applications.
+          </p>
           <p>
-            These results suggest that lightweight acoustic classifiers may be sufficient for
-            real-time vocal affect tagging in music information retrieval (MIR) or recommendation
-            systems, without requiring deep neural architectures.
+            In practice, this type of model could help music recommendation systems tag songs by
+            vocal intensity, support mood-aware playlist generation, or allow audio libraries to be
+            searched by vocal qualities such as airy, intimate, bright, or powerful delivery. The
+            findings also suggest that singing technique contains structured acoustic information
+            related to perceived emotional energy.
           </p>
         </div>
+
         <div class="note-card">
           <span class="note-label">Limitations</span>
           <ul class="note-list">
             <li>
-              <strong>Single dataset.</strong> All results come from VocalSet — studio recordings of
-              trained singers. Generalization to in-the-wild, live, or low-fidelity audio is untested.
+              <strong>Single dataset.</strong> All results come from VocalSet (studio recordings of
+              trained singers). Generalization to in-the-wild, live, or low-fidelity audio is untested.
             </li>
             <li>
-              <strong>Small test set.</strong> ~80 held-out clips after cleaning. Reported metrics
-              carry meaningful variance — confidence intervals were not estimated.
+              <strong>Small test set.</strong> Approximately 80 held-out clips after cleaning. Reported
+              metrics carry meaningful variance, and confidence intervals were not estimated.
             </li>
             <li>
               <strong>No singer-level grouping.</strong> The 80/20 split is stratified on class but
               not on singer ID, so clips from the same singer can appear in both train and test. This
-              may modestly inflate accuracy compared to a stricter setup where all clips from a given
-              singer are kept entirely in one split.
+              may modestly inflate accuracy compared to a stricter singer-disjoint setup.
             </li>
             <li>
               <strong>Cultural and linguistic scope.</strong> VocalSet is predominantly
@@ -892,6 +901,35 @@
             </li>
           </ul>
         </div>
+
+        <div class="note-card" style="border-left-color: var(--color-purple);">
+          <span class="note-label">Future Work</span>
+          <ul class="note-list">
+            <li>
+              <strong>Singer-level evaluation.</strong> Re-evaluate using singer-disjoint splits to
+              test whether the model generalizes to unseen singers.
+            </li>
+            <li>
+              <strong>Expanded technique coverage.</strong> Extend classification beyond belt and
+              breathy to include additional VocalSet techniques such as vibrato, straight, fry, and
+              falsetto.
+            </li>
+            <li>
+              <strong>In-the-wild audio.</strong> Test on commercial or user-recorded singing after
+              applying source separation to isolate the vocal track.
+            </li>
+            <li>
+              <strong>Temporal modeling.</strong> Add sequence-aware features or models (such as
+              LSTMs or attention-based architectures) to capture how vocal technique evolves across
+              the duration of a clip.
+            </li>
+            <li>
+              <strong>Deep learning comparison.</strong> Benchmark lightweight classifiers against
+              CNN or transformer-based models trained directly on raw spectrograms.
+            </li>
+          </ul>
+        </div>
+
       </div>
     </div>
   </section>

@@ -296,6 +296,10 @@
       .results-figures {
         grid-template-columns: 1fr;
       }
+
+      .rq-grid {
+        grid-template-columns: 1fr !important;
+      }
     }
   </style>
 </head>
@@ -406,37 +410,69 @@
   <section class="prose-section section-light">
     <div class="container">
       <p class="section-label">Research Questions &amp; Hypotheses</p>
-      <h2 style="color: var(--text-dark-primary); margin-bottom: var(--space-xl);">Hypotheses</h2>
-      <ul class="hypothesis-list">
-        <li>
-          <span class="h-num">H1</span>
-          <div>
-            <span class="h-text">Belt vocals will have a higher median fundamental frequency (f0, i.e. perceived pitch) than breathy vocals.</span>
-            <span class="h-feature">Feature: f0 &middot; Prediction: belt median f0 &gt; breathy median f0</span>
-          </div>
-        </li>
-        <li>
-          <span class="h-num">H2</span>
-          <div>
-            <span class="h-text">Belt vocals will sound brighter, reflected in higher spectral centroid and rolloff values. Spectral centroid measures how high-frequency-weighted the sound energy is; rolloff marks the frequency below which 85% of energy falls.</span>
-            <span class="h-feature">Features: spectral_centroid, spectral_rolloff</span>
-          </div>
-        </li>
-        <li>
-          <span class="h-num">H3</span>
-          <div>
-            <span class="h-text">Belt vocals will sound cleaner and more tonal, resulting in a higher harmonic-to-noise ratio (HNR). HNR measures how much of the voice is clean harmonic tone versus airy noise.</span>
-            <span class="h-feature">Feature: HNR &middot; Belt HNR &gt; Breathy HNR</span>
-          </div>
-        </li>
-        <li>
-          <span class="h-num">H4</span>
-          <div>
-            <span class="h-text">Adding MFCC features (which capture tone color and texture beyond simple pitch and brightness) will significantly improve classification accuracy beyond the four base acoustic features alone.</span>
-            <span class="h-feature">Features: mfcc_0 – mfcc_12</span>
-          </div>
-        </li>
-      </ul>
+      <div class="rq-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-xl); align-items: start;">
+
+        <!-- Research Questions column -->
+        <div>
+          <h2 style="color: var(--text-dark-primary); margin-bottom: var(--space-lg); font-size: var(--text-lg);">Research Questions</h2>
+          <ul class="hypothesis-list">
+            <li style="border-left-color: var(--color-green-dark);">
+              <span class="h-num" style="color: var(--color-green-dark);">RQ1</span>
+              <div>
+                <span class="h-text">Can vocal techniques associated with different emotional energy levels be distinguished using acoustic features?</span>
+              </div>
+            </li>
+            <li style="border-left-color: var(--color-green-dark);">
+              <span class="h-num" style="color: var(--color-green-dark);">RQ2</span>
+              <div>
+                <span class="h-text">Which acoustic properties are most useful for separating belt and breathy singing?</span>
+              </div>
+            </li>
+            <li style="border-left-color: var(--color-green-dark);">
+              <span class="h-num" style="color: var(--color-green-dark);">RQ3</span>
+              <div>
+                <span class="h-text">Do MFCC features provide significantly more discriminative information than traditional spectral features alone?</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Hypotheses column -->
+        <div>
+          <h2 style="color: var(--text-dark-primary); margin-bottom: var(--space-lg); font-size: var(--text-lg);">Hypotheses</h2>
+          <ul class="hypothesis-list">
+            <li>
+              <span class="h-num">H1</span>
+              <div>
+                <span class="h-text">Belt vocals will have a higher median fundamental frequency (f0, i.e. perceived pitch) than breathy vocals.</span>
+                <span class="h-feature">Feature: f0 &middot; Prediction: belt median f0 &gt; breathy median f0</span>
+              </div>
+            </li>
+            <li>
+              <span class="h-num">H2</span>
+              <div>
+                <span class="h-text">Belt vocals will sound brighter, reflected in higher spectral centroid and rolloff values.</span>
+                <span class="h-feature">Features: spectral_centroid, spectral_rolloff</span>
+              </div>
+            </li>
+            <li>
+              <span class="h-num">H3</span>
+              <div>
+                <span class="h-text">Belt vocals will sound cleaner and more tonal, resulting in a higher harmonic-to-noise ratio (HNR).</span>
+                <span class="h-feature">Feature: HNR &middot; Belt HNR &gt; Breathy HNR</span>
+              </div>
+            </li>
+            <li>
+              <span class="h-num">H4</span>
+              <div>
+                <span class="h-text">Adding MFCC features will significantly improve classification accuracy beyond the four base acoustic features alone.</span>
+                <span class="h-feature">Features: mfcc_0 – mfcc_12</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+      </div>
     </div>
   </section>
 
