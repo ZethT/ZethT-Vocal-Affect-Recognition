@@ -63,6 +63,41 @@ The project flows end-to-end from raw audio to a live web demo:
 
 **Scalability.** The frontend is static, so App Engine serves it from edge cache with no per-request compute. The inference service is stateless: the model is loaded once at container startup (`backend/model.py`) and each request runs feature extraction + prediction in isolation, which lets Cloud Run autoscale instances horizontally with traffic. Storage is decoupled — Firestore writes are best-effort and never block a response.
 
+## Inference Service
+
+The inference service is a containerized FastAPI app in `backend/`, deployed to Cloud Run.
+
+- **Docker code:** `backend/Dockerfile` (built from the repo root so it can bundle `model/vocal_model_lr.joblib`).
+- **Model training code:** `notebooks/CS_163_Project.ipynb`. The notebook trains Logistic Regression, Random Forest, and XGBoost on the cleaned feature set and serializes the chosen model to `model/vocal_model_lr.joblib`.
+- **What it does:** accepts a `.wav` upload, extracts 17 acoustic features (F0, Spectral Centroid, Spectral Rolloff, HNR, 13 MFCCs) via `backend/features.py`, runs the serialized scikit-learn pipeline in `backend/model.py`, and returns a JSON prediction.
+
+**Endpoints:**
+
+| Method | Path | Input | Output |
+| :--- | :--- | :--- | :--- |
+| GET  | `/health`  | — | `{"status": "ok"}` |
+| POST | `/predict` | multipart `.wav` file (`file=<audio>`) | `{label, confidence, probabilities: {high_energy, low_energy}, features: {f0, spectral_centroid, spectral_rolloff, hnr}}` |
+
+## Data Stored in the Cloud
+
+**What:** every call to `/predict` writes one document to the Firestore `predictions` collection (`backend/firestore_client.py:17`).
+
+**How (document schema, `backend/firestore_client.py:55-64`):**
+
+```text
+predictions/{auto-id}
+  timestamp:          datetime (UTC)
+  label:              "high_energy" | "low_energy"
+  confidence:         float
+  probabilities:      { high_energy: float, low_energy: float }
+  f0:                 float
+  spectral_centroid:  float
+  spectral_rolloff:   float
+  hnr:                float
+```
+
+**How it's consumed by the website:** the demo page (`frontend/demo.html` + `frontend/demo.js`) is the producer — when a user uploads a `.wav`, the browser calls `/predict` on the Cloud Run service, which runs inference and then writes the result to Firestore as a side effect (`backend/main.py:57-69`). The write is best-effort: if Firestore is unavailable the prediction response still succeeds.
+
 ## Built With
 
 ### Languages
